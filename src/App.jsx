@@ -21,38 +21,45 @@ function App() {
     setFields(0);
   };
 
-  const fieldElements = [];
-  for (let i = 0; i < fields; i++) {
-    fieldElements.push(<PNField key={i} col={i} total={fields} />);
-  }
-
   function getFormData() {
     let valObj = {};
     let descObj = {};
     let obj = {};
     let keys = [];
     let delimArr = [];
+    let prevVal;
+    let prevDesc;
+    let prevField;
     const formData = new FormData(formRef.current);
     for (const val of formData.entries()) {
-      // console.log(val);
       if (val[0].slice(0, 8).includes("fieldVal")) {
-        // console.log("field");
         if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
           valObj[val[0].split("fieldVal ")[1]].push(val[1]);
         } else {
           valObj[val[0].split("fieldVal ")[1]] = [val[1]];
         }
-      } else if (val[0].slice(0, 7).includes("descVal")) {
-        // console.log("desc");
+        prevVal = val[1];
+      } else if (val[0].slice(0, 8).includes("descVal")) {
         if (descObj[val[0].split("descVal ")[1]] != undefined) {
           descObj[val[0].split("descVal ")[1]].push(val[1]);
         } else {
           descObj[val[0].split("descVal ")[1]] = [val[1]];
         }
+        prevDesc = val[1];
       } else if (val[0].includes("delimeter")) {
-        // console.log("delim");
         delimArr.push(val[1]);
+      } else if (val[0].includes("unit")) {
+        let ranges = createRange(val[1], prevVal, prevDesc);
+        valObj[prevField].pop();
+        descObj[prevField].pop();
+        ranges[0].forEach((range, i) => {
+          let value = range;
+          let desc = ranges[1][i];
+          valObj[prevField].push(value);
+          descObj[prevField].push(desc);
+        });
       }
+      prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
     }
     for (let params in valObj) {
       keys.push(params);
@@ -81,55 +88,10 @@ function App() {
   }
 
   // the input, the current iteration, the working set, the working details, the object writing to, an array of delimeters to map
-  function generateCombinations(
-    obj,
-    keys,
-    index,
-    currentPN,
-    currentDetails,
-    returnObject,
-    delimeters
-  ) {
-    if (index == keys.length) {
-      // map out delimiters to pn by apopending to their string before joining
-      delimeters.forEach((d, i) => {
-        if (d != "(none)") {
-          // so we dont keep adding "-" everytime we get to the same pn
-          if (
-            !currentPN[i]
-              .slice(currentPN[i].length - 1, currentPN[i].length)
-              .includes(d)
-          ) {
-            currentPN[i] = currentPN[i] + d;
-          }
-        }
-      });
-      // append to combos object
-      returnObject[currentPN.join("")] = Object.assign({}, currentDetails);
-    } else {
-      const currentKey = keys[index];
-      const innerArray = obj[currentKey];
-      for (const innerObj of innerArray) {
-        const innerKey = Object.keys(innerObj)[0];
-        const innerVal = Object.values(innerObj)[0];
-        currentPN.push(innerKey);
 
-        const updatedDetails = Object.assign({}, currentDetails);
-        updatedDetails[currentKey] = innerVal;
-
-        generateCombinations(
-          obj,
-          keys,
-          index + 1,
-          currentPN,
-          updatedDetails,
-          returnObject,
-          delimeters
-        );
-        currentPN.pop();
-        delete currentDetails[currentKey];
-      }
-    }
+  const fieldElements = [];
+  for (let i = 0; i < fields; i++) {
+    fieldElements.push(<PNField key={i} col={i} total={fields} />);
   }
 
   return (
@@ -160,6 +122,57 @@ function App() {
   );
 }
 
+function generateCombinations(
+  obj,
+  keys,
+  index,
+  currentPN,
+  currentDetails,
+  returnObject,
+  delimeters
+) {
+  if (index == keys.length) {
+    // map out delimiters to pn by apopending to their string before joining
+    delimeters.forEach((d, i) => {
+      if (d != "(none)") {
+        // so we dont keep adding "-" everytime we get to the same pn
+        if (
+          !currentPN[i]
+            .slice(currentPN[i].length - 1, currentPN[i].length)
+            .includes(d)
+        ) {
+          currentPN[i] = currentPN[i] + d;
+        }
+      }
+    });
+    // append to combos object
+    returnObject[currentPN.join("")] = Object.assign({}, currentDetails);
+  } else {
+    const currentKey = keys[index];
+    const innerArray = obj[currentKey];
+    for (const innerObj of innerArray) {
+      const innerKey = Object.keys(innerObj)[0];
+      const innerVal = Object.values(innerObj)[0];
+      currentPN.push(innerKey);
+
+      const updatedDetails = Object.assign({}, currentDetails);
+      updatedDetails[currentKey] = innerVal;
+
+      generateCombinations(
+        obj,
+        keys,
+        index + 1,
+        currentPN,
+        updatedDetails,
+        returnObject,
+        delimeters
+      );
+      currentPN.pop();
+      delete currentDetails[currentKey];
+    }
+  }
+}
+
 function convertToCSV(inputObject) {
   let header;
   for (let pn in inputObject) {
@@ -175,6 +188,31 @@ function convertToCSV(inputObject) {
   });
 
   return `${header}\n${rows.join("\n")}`;
+}
+
+function createRange(increment, value, description) {
+  let decimalPlaces;
+  let arr = value.split("~");
+  if (increment.split(".")[1]) {
+    decimalPlaces = increment.split(".")[1].length;
+  }
+  increment = parseFloat(increment);
+  // console.log(arr);
+  let start = parseFloat(arr[0]);
+  let end = parseFloat(arr[1]);
+  let unit = arr[1].split(end)[1];
+  let descPrefix = description.split(start)[0] || "";
+  let descSuffix = description.split(end)[1] || description;
+  let valArr = [];
+  let descArr = [];
+
+  // start + 1 since we already put the previous value on here in getFormData
+  for (let i = start; i < end; i += increment) {
+    let roundedValue = i.toFixed(decimalPlaces);
+    valArr.push(`${roundedValue}${unit}`);
+    descArr.push(`${descPrefix} ${roundedValue} ${descSuffix}`);
+  }
+  return [valArr, descArr];
 }
 
 export default App;
