@@ -1,16 +1,18 @@
 export function InputField(props) {
   return (
-    <>
-      <input
-        name={`field ${props.col}-${props.fieldName}`}
-        type="text"
-        placeholder="Part numbering value"
-      ></input>
-      <input
-        name={`desc ${props.col}-${props.fieldName}`}
-        type="text"
-        placeholder="Description"
-      ></input>
-    </>
+    <div className="input-field">
+      <div className="field-container">
+        <input
+          name={`fieldVal ${props.col}-${props.fieldName}`}
+          type="text"
+          placeholder="Part numbering value"
+        ></input>
+        <input
+          name={`descVal ${props.col}-${props.fieldName}`}
+          type="text"
+          placeholder="Description"
+        ></input>
+      </div>
+    </div>
   );
 }

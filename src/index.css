@@ -41,6 +41,15 @@ button:focus-visible {
   margin-bottom: 5px;
 }
 
+.input-field {
+  display: flex;
+  flex-direction: row;
+}
+
+.delimeter-container {
+  align-self: center;
+}
+
 #pn-container {
   display: flex;
   flex-direction: row;

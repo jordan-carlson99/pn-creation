@@ -22,20 +22,30 @@ export function PNField(props) {
   }
 
   return (
-    <div className="column">
-      <input
-        type="text"
-        onChange={changeName}
-        placeholder="Field Name"
-        className="field-name"
-      ></input>
-      {rowElems}
-      <button type="button" className="addition-btn" onClick={subRow}>
-        -
-      </button>
-      <button type="button" className="addition-btn" onClick={addRow}>
-        +
-      </button>
-    </div>
+    <>
+      <div className="column" key={props.col}>
+        <input
+          type="text"
+          onChange={changeName}
+          placeholder="Field Name"
+          className="field-name"
+        ></input>
+        {rowElems}
+        <button type="button" className="addition-btn" onClick={subRow}>
+          -
+        </button>
+        <button type="button" className="addition-btn" onClick={addRow}>
+          +
+        </button>
+      </div>
+      {props.col !== props.total - 1 && (
+        <div className="delimeter-container">
+          <select name="delimeter">
+            <option>(none)</option>
+            <option>-</option>
+          </select>
+        </div>
+      )}
+    </>
   );
 }

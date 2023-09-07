@@ -23,7 +23,7 @@ function App() {
 
   const fieldElements = [];
   for (let i = 0; i < fields; i++) {
-    fieldElements.push(<PNField key={i} col={i} />);
+    fieldElements.push(<PNField key={i} col={i} total={fields} />);
   }
 
   function getFormData() {
@@ -31,20 +31,27 @@ function App() {
     let descObj = {};
     let obj = {};
     let keys = [];
+    let delimArr = [];
     const formData = new FormData(formRef.current);
     for (const val of formData.entries()) {
-      if (val[0].includes("field")) {
-        if (valObj[val[0].split("field ")[1]] != undefined) {
-          valObj[val[0].split("field ")[1]].push(val[1]);
+      // console.log(val);
+      if (val[0].slice(0, 8).includes("fieldVal")) {
+        // console.log("field");
+        if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
+          valObj[val[0].split("fieldVal ")[1]].push(val[1]);
         } else {
-          valObj[val[0].split("field ")[1]] = [val[1]];
+          valObj[val[0].split("fieldVal ")[1]] = [val[1]];
         }
-      } else {
-        if (descObj[val[0].split("desc ")[1]] != undefined) {
-          descObj[val[0].split("desc ")[1]].push(val[1]);
+      } else if (val[0].slice(0, 7).includes("descVal")) {
+        // console.log("desc");
+        if (descObj[val[0].split("descVal ")[1]] != undefined) {
+          descObj[val[0].split("descVal ")[1]].push(val[1]);
         } else {
-          descObj[val[0].split("desc ")[1]] = [val[1]];
+          descObj[val[0].split("descVal ")[1]] = [val[1]];
         }
+      } else if (val[0].includes("delimeter")) {
+        // console.log("delim");
+        delimArr.push(val[1]);
       }
     }
     for (let params in valObj) {
@@ -56,22 +63,15 @@ function App() {
       obj[params] = arr;
     }
 
-    return [obj, keys];
+    return [obj, keys, delimArr];
   }
 
   function run() {
     let data = getFormData();
     let keys = data[1];
     let combos = {};
-    let testObj = {
-      "0-test": [
-        {
-          val: "desc",
-        },
-      ],
-    };
-    // console.log(data[0]);
-    generateCombinations(data[0], keys, 0, [], {}, combos);
+    // console.log(data[2]);
+    generateCombinations(data[0], keys, 0, [], {}, combos, data[2]);
     // console.log(combos);
     let csv = convertToCSV(combos);
     console.log(csv);
@@ -80,18 +80,32 @@ function App() {
     setBlobLink(url);
   }
 
-  // the input, the current iteration, and the working set
+  // the input, the current iteration, the working set, the working details, the object writing to, an array of delimeters to map
   function generateCombinations(
     obj,
     keys,
     index,
     currentPN,
     currentDetails,
-    returnObject
+    returnObject,
+    delimeters
   ) {
     if (index == keys.length) {
+      // map out delimiters to pn by apopending to their string before joining
+      delimeters.forEach((d, i) => {
+        if (d != "(none)") {
+          // so we dont keep adding "-" everytime we get to the same pn
+          if (
+            !currentPN[i]
+              .slice(currentPN[i].length - 1, currentPN[i].length)
+              .includes(d)
+          ) {
+            currentPN[i] = currentPN[i] + d;
+          }
+        }
+      });
       // append to combos object
-      returnObject[currentPN.join("-")] = Object.assign({}, currentDetails);
+      returnObject[currentPN.join("")] = Object.assign({}, currentDetails);
     } else {
       const currentKey = keys[index];
       const innerArray = obj[currentKey];
@@ -109,7 +123,8 @@ function App() {
           index + 1,
           currentPN,
           updatedDetails,
-          returnObject
+          returnObject,
+          delimeters
         );
         currentPN.pop();
         delete currentDetails[currentKey];
