@@ -18,7 +18,13 @@ export function PNField(props) {
 
   let rowElems = [];
   for (let i = 0; i < rows; i++) {
-    rowElems.push(<InputField col={props.col} fieldName={fieldName} />);
+    rowElems.push(
+      <InputField
+        col={props.col}
+        fieldName={fieldName}
+        setExample={props.setExample}
+      />
+    );
   }
 
   return (

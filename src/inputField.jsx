@@ -3,7 +3,8 @@ import { useState } from "react";
 export function InputField(props) {
   const [isRange, setIsRange] = useState(false);
 
-  const checkForRange = (e) => {
+  const checkForRangeAndSetExample = (e) => {
+    props.setExample(e.target.value);
     if (e.target.value.includes("~")) {
       setIsRange(true);
     } else {
@@ -12,6 +13,7 @@ export function InputField(props) {
       }
     }
   };
+
   return (
     <div className="input-field">
       <div className="field-container">
@@ -19,7 +21,7 @@ export function InputField(props) {
           name={`fieldVal ${props.col}-${props.fieldName}`}
           type="text"
           placeholder="Part numbering value"
-          onChange={checkForRange}
+          onChange={checkForRangeAndSetExample}
         ></input>
         <input
           name={`descVal ${props.col}-${props.fieldName}`}

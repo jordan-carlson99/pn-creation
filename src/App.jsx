@@ -1,10 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { PNField } from "./pnField";
 
 function App() {
   const [fields, setFields] = useState(1);
   const [blobLink, setBlobLink] = useState("/");
+  const [example, setExample] = useState(null);
+  const [exampleText, setExampleText] = useState(null);
   const formRef = useRef(null);
 
   const addField = () => {
@@ -21,86 +23,35 @@ function App() {
     setFields(0);
   };
 
-  function getFormData() {
-    let valObj = {};
-    let descObj = {};
-    let obj = {};
-    let keys = [];
-    let delimArr = [];
-    let prevVal;
-    let prevDesc;
-    let prevField;
-    let uniqueDelim = false;
-    const formData = new FormData(formRef.current);
-    for (const val of formData.entries()) {
-      console.log(val);
-      if (val[0].slice(0, 8).includes("fieldVal")) {
-        if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
-          valObj[val[0].split("fieldVal ")[1]].push(val[1]);
-        } else {
-          valObj[val[0].split("fieldVal ")[1]] = [val[1]];
-        }
-        prevVal = val[1];
-        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].slice(0, 8).includes("descVal")) {
-        if (descObj[val[0].split("descVal ")[1]] != undefined) {
-          descObj[val[0].split("descVal ")[1]].push(val[1]);
-        } else {
-          descObj[val[0].split("descVal ")[1]] = [val[1]];
-        }
-        prevDesc = val[1];
-        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].includes("delimeter")) {
-        delimArr.push(val[1]);
-        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].includes("unit")) {
-        let ranges = createRange(val[1], prevVal, prevDesc, uniqueDelim);
-        valObj[prevField].pop();
-        descObj[prevField].pop();
-        ranges[0].forEach((range, i) => {
-          let value = range;
-          let desc = ranges[1][i];
-          valObj[prevField].push(value);
-          descObj[prevField].push(desc);
-        });
-      } else if (val[0].includes("rangeDelim")) {
-        if (val[1] != "") {
-          uniqueDelim = val[1];
-        }
-      }
-    }
-    for (let params in valObj) {
-      keys.push(params);
-      let arr = [];
-      valObj[params].forEach((elem, i) => {
-        arr.push({ [elem]: descObj[params][i] });
-      });
-      obj[params] = arr;
-    }
-
-    return [obj, keys, delimArr];
-  }
-
   function run() {
-    let data = getFormData();
+    let data = getFormData(formRef);
     let keys = data[1];
     let combos = {};
-    // console.log(data[2]);
     generateCombinations(data[0], keys, 0, [], {}, combos, data[2]);
-    // console.log(combos);
+    console.log(combos);
     let csv = convertToCSV(combos);
     console.log(csv);
     const blob = new Blob([csv], { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
     setBlobLink(url);
+    return combos;
   }
 
   // the input, the current iteration, the working set, the working details, the object writing to, an array of delimeters to map
 
   const fieldElements = [];
   for (let i = 0; i < fields; i++) {
-    fieldElements.push(<PNField key={i} col={i} total={fields} />);
+    fieldElements.push(
+      <PNField key={i} col={i} total={fields} setExample={setExample} />
+    );
   }
+  useEffect(() => {
+    let data = run();
+    if (data) {
+      setExampleText(Object.keys(data)[0]);
+      console.log(exampleText);
+    }
+  }, [example]);
 
   return (
     <>
@@ -124,10 +75,71 @@ function App() {
         </button>
       </div>
       <a href={blobLink} download="part_data.csv">
-        link
+        Download CSV
       </a>
+      <h3>{exampleText}</h3>
     </>
   );
+}
+
+function getFormData(formRef) {
+  let valObj = {};
+  let descObj = {};
+  let obj = {};
+  let keys = [];
+  let delimArr = [];
+  let prevVal;
+  let prevDesc;
+  let prevField;
+  let uniqueDelim = false;
+  const formData = new FormData(formRef.current);
+  for (const val of formData.entries()) {
+    console.log(val);
+    if (val[0].slice(0, 8).includes("fieldVal")) {
+      if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
+        valObj[val[0].split("fieldVal ")[1]].push(val[1]);
+      } else {
+        valObj[val[0].split("fieldVal ")[1]] = [val[1]];
+      }
+      prevVal = val[1];
+      prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
+    } else if (val[0].slice(0, 8).includes("descVal")) {
+      if (descObj[val[0].split("descVal ")[1]] != undefined) {
+        descObj[val[0].split("descVal ")[1]].push(val[1]);
+      } else {
+        descObj[val[0].split("descVal ")[1]] = [val[1]];
+      }
+      prevDesc = val[1];
+      prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
+    } else if (val[0].includes("delimeter")) {
+      delimArr.push(val[1]);
+      prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
+    } else if (val[0].includes("unit")) {
+      let ranges = createRange(val[1], prevVal, prevDesc, uniqueDelim);
+      valObj[prevField].pop();
+      descObj[prevField].pop();
+      ranges[0].forEach((range, i) => {
+        let value = range;
+        let desc = ranges[1][i];
+        valObj[prevField].push(value);
+        descObj[prevField].push(desc);
+      });
+    } else if (val[0].includes("rangeDelim")) {
+      if (val[1] != "") {
+        uniqueDelim = val[1];
+      }
+    }
+  }
+  for (let params in valObj) {
+    keys.push(params);
+    let arr = [];
+    valObj[params].forEach((elem, i) => {
+      arr.push({ [elem]: descObj[params][i] });
+    });
+    obj[params] = arr;
+  }
+
+  return [obj, keys, delimArr];
 }
 
 function generateCombinations(
