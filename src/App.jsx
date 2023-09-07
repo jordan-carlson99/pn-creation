@@ -30,8 +30,10 @@ function App() {
     let prevVal;
     let prevDesc;
     let prevField;
+    let uniqueDelim = false;
     const formData = new FormData(formRef.current);
     for (const val of formData.entries()) {
+      console.log(val);
       if (val[0].slice(0, 8).includes("fieldVal")) {
         if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
           valObj[val[0].split("fieldVal ")[1]].push(val[1]);
@@ -39,6 +41,7 @@ function App() {
           valObj[val[0].split("fieldVal ")[1]] = [val[1]];
         }
         prevVal = val[1];
+        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
       } else if (val[0].slice(0, 8).includes("descVal")) {
         if (descObj[val[0].split("descVal ")[1]] != undefined) {
           descObj[val[0].split("descVal ")[1]].push(val[1]);
@@ -46,10 +49,12 @@ function App() {
           descObj[val[0].split("descVal ")[1]] = [val[1]];
         }
         prevDesc = val[1];
+        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
       } else if (val[0].includes("delimeter")) {
         delimArr.push(val[1]);
+        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
       } else if (val[0].includes("unit")) {
-        let ranges = createRange(val[1], prevVal, prevDesc);
+        let ranges = createRange(val[1], prevVal, prevDesc, uniqueDelim);
         valObj[prevField].pop();
         descObj[prevField].pop();
         ranges[0].forEach((range, i) => {
@@ -58,8 +63,11 @@ function App() {
           valObj[prevField].push(value);
           descObj[prevField].push(desc);
         });
+      } else if (val[0].includes("rangeDelim")) {
+        if (val[1] != "") {
+          uniqueDelim = val[1];
+        }
       }
-      prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
     }
     for (let params in valObj) {
       keys.push(params);
@@ -190,7 +198,7 @@ function convertToCSV(inputObject) {
   return `${header}\n${rows.join("\n")}`;
 }
 
-function createRange(increment, value, description) {
+function createRange(increment, value, description, delimeter) {
   let decimalPlaces;
   let arr = value.split("~");
   if (increment.split(".")[1]) {
@@ -209,6 +217,9 @@ function createRange(increment, value, description) {
   // start + 1 since we already put the previous value on here in getFormData
   for (let i = start; i < end; i += increment) {
     let roundedValue = i.toFixed(decimalPlaces);
+    if (delimeter) {
+      roundedValue = roundedValue.split(".").join(delimeter);
+    }
     valArr.push(`${roundedValue}${unit}`);
     descArr.push(`${descPrefix} ${roundedValue} ${descSuffix}`);
   }
