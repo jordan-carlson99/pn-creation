@@ -91,7 +91,7 @@ function getFormData(formRef) {
   let prevVal;
   let prevDesc;
   let prevField;
-  let uniqueDelim = false;
+  let uniqueDelim = "";
   const formData = new FormData(formRef.current);
   for (const val of formData.entries()) {
     console.log(val);
@@ -211,7 +211,7 @@ function convertToCSV(inputObject) {
 }
 
 function createRange(increment, value, description, delimeter) {
-  let decimalPlaces;
+  let decimalPlaces = 1;
   let arr = value.split("~");
   if (increment.split(".")[1]) {
     decimalPlaces = increment.split(".")[1].length;
@@ -231,6 +231,8 @@ function createRange(increment, value, description, delimeter) {
     let roundedValue = i.toFixed(decimalPlaces);
     if (delimeter) {
       roundedValue = roundedValue.split(".").join(delimeter);
+    } else {
+      roundedValue = roundedValue + delimeter + "0";
     }
     valArr.push(`${roundedValue}${unit}`);
     descArr.push(`${descPrefix} ${roundedValue} ${descSuffix}`);

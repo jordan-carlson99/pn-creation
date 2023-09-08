@@ -35,6 +35,7 @@ export function InputField(props) {
           <select name="unit">
             <option>100</option>
             <option>10</option>
+            <option>5</option>
             <option>1</option>
             <option>0.1</option>
             <option>0.01</option>
