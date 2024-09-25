@@ -294,7 +294,6 @@ function createRange(
   let start = parseFloat(arr[0]);
   let end = parseFloat(arr[1]);
   let unit = arr[1].split(end)[1];
-  let descPrefix = description.split(start)[0] || "";
   let descSuffix = description.split(end)[1] || description;
   let valArr = [];
   let descArr = [];
@@ -317,7 +316,7 @@ function createRange(
       const postChars = roundedValue.split(".")[1].length;
       const lastZero = roundedValue.split(".")[1].indexOf("0");
 
-      for (let i = preChars; i <= preDecimalDigits; i++) {
+      for (let i = preChars; i < preDecimalDigits; i++) {
         precedingZeroes += "0";
       }
 
@@ -332,13 +331,14 @@ function createRange(
       //   `preceeding chars is ${preChars} / ${preDecimalDigits} \npost chars is ${postChars} / ${postDecimalDigits}\n on ${roundedValue}`
       // );
 
+      let delimitedRoundedValue;
       if (delimeter) {
-        roundedValue = roundedValue.split(".").join(delimeter);
+        delimitedRoundedValue = roundedValue.split(".").join(delimeter);
       } else {
-        roundedValue = roundedValue;
+        delimitedRoundedValue = roundedValue;
       }
-      valArr.push(`${roundedValue}${unit}`);
-      descArr.push(`${descPrefix} ${roundedValue} ${descSuffix}`);
+      valArr.push(`${delimitedRoundedValue}${unit}`);
+      descArr.push(`${roundedValue} ${descSuffix}`);
     }
   }
   return [valArr, descArr];
