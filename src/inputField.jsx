@@ -31,16 +31,31 @@ export function InputField(props) {
       </div>
       {isRange && (
         <>
-          <input type="text" placeholder="delimeter?" name="rangeDelim"></input>
-          <select name="unit">
-            <option>100</option>
-            <option>10</option>
-            <option>5</option>
-            <option>1</option>
-            <option>0.1</option>
-            <option>0.01</option>
-            <option>0.001</option>
-          </select>
+          <input type="text" placeholder="Delimeter" name="rangeDelim"></input>
+          <label>
+            EIA Value
+            <select name="eiaValue" placeholder="EIA Value">
+              <option>N/A</option>
+              <option>E6</option>
+              <option>E12</option>
+              <option>E24</option>
+              <option>E48</option>
+              <option>E96</option>
+              <option>E192</option>
+            </select>
+          </label>
+          <label>
+            Unit Size
+            <select name="unit">
+              <option>100</option>
+              <option>10</option>
+              <option>5</option>
+              <option>1</option>
+              <option>0.1</option>
+              <option>0.01</option>
+              <option>0.001</option>
+            </select>
+          </label>
         </>
       )}
     </div>
