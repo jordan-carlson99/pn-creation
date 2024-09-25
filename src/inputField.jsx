@@ -28,7 +28,7 @@ export function InputField(props) {
         <input
           name={`descVal ${props.col}-${props.fieldName}`}
           type="text"
-          placeholder="Description"
+          placeholder={isRange ? "Unit" : "Description"}
         ></input>
       </div>
       {isRange && (
