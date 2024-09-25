@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function InputField(props) {
   const [isRange, setIsRange] = useState(false);
 
   const checkForRangeAndSetExample = (e) => {
     props.setExample(e.target.value);
-    if (e.target.value.includes("~")) {
-      setIsRange(true);
-    } else {
-      if (isRange == true) {
-        setIsRange(false);
+    if (e.target.name.includes("fieldVal")) {
+      if (e.target.value.includes("~")) {
+        setIsRange(true);
+      } else {
+        if (isRange == true) {
+          setIsRange(false);
+        }
       }
     }
   };
@@ -32,22 +34,15 @@ export function InputField(props) {
       {isRange && (
         <>
           <input type="text" placeholder="Delimeter" name="rangeDelim"></input>
-          {/* <label>
-            EIA Value
-            <select name="eiaValue" placeholder="EIA Value">
-              <option>N/A</option>
-              <option>E6</option>
-              <option>E12</option>
-              <option>E24</option>
-              <option>E48</option>
-              <option>E96</option>
-              <option>E192</option>
-            </select>
-          </label> */}
           <div id="eia-container">
             <label htmlFor="eia-e6">
               E6
-              <input type="checkbox" name="eiaValue" value="e6"></input>
+              <input
+                type="checkbox"
+                name="eiaValue"
+                value="e6"
+                onChange={checkForRangeAndSetExample}
+              ></input>
             </label>
             <label htmlFor="eia-e12">
               E12
@@ -56,6 +51,7 @@ export function InputField(props) {
                 name="eiaValue"
                 id="eia-e12"
                 value="e12"
+                onChange={checkForRangeAndSetExample}
               ></input>
             </label>
             <label htmlFor="eia-e24">
@@ -65,6 +61,7 @@ export function InputField(props) {
                 name="eiaValue"
                 id="eia-e24"
                 value="e24"
+                onChange={checkForRangeAndSetExample}
               ></input>
             </label>
             <label htmlFor="eia-e48">
@@ -74,6 +71,7 @@ export function InputField(props) {
                 name="eiaValue"
                 id="eia-e48"
                 value="e48"
+                onChange={checkForRangeAndSetExample}
               ></input>
             </label>
             <label htmlFor="eia-e96">
@@ -83,6 +81,7 @@ export function InputField(props) {
                 name="eiaValue"
                 id="eia-e96"
                 value="e96"
+                onChange={checkForRangeAndSetExample}
               ></input>
             </label>
             <label htmlFor="eia-e192">
@@ -92,12 +91,17 @@ export function InputField(props) {
                 name="eiaValue"
                 id="eia-e192"
                 value="e192"
+                onChange={checkForRangeAndSetExample}
               ></input>
             </label>
           </div>
           <label>
             Pre Decimal Digits
-            <select name="preDecimalDigits" id="pre-decimal-digits">
+            <select
+              name="preDecimalDigits"
+              id="pre-decimal-digits"
+              onChange={checkForRangeAndSetExample}
+            >
               <option>0</option>
               <option>1</option>
               <option>2</option>
@@ -107,7 +111,11 @@ export function InputField(props) {
           </label>
           <label>
             Post Decimal Digits
-            <select name="postDecimalDigits" id="post-decimal-digits">
+            <select
+              name="postDecimalDigits"
+              id="post-decimal-digits"
+              onChange={checkForRangeAndSetExample}
+            >
               <option>0</option>
               <option>1</option>
               <option>2</option>
@@ -118,7 +126,7 @@ export function InputField(props) {
           </label>
           <label>
             Unit Size
-            <select name="unit">
+            <select name="unit" onChange={checkForRangeAndSetExample}>
               <option>100</option>
               <option>10</option>
               <option>5</option>

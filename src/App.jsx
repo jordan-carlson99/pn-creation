@@ -99,8 +99,9 @@ function App() {
   useEffect(() => {
     let data = run();
     if (data) {
+      console.log("example was updated");
+
       setExampleText(Object.keys(data)[0]);
-      // console.log(exampleText);
     }
   }, [example]);
 
