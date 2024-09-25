@@ -107,12 +107,13 @@ export function InputField(props) {
           </label>
           <label>
             Post Decimal Digits
-            <select name="fixedSize" id="fixed-size">
+            <select name="postDecimalDigits" id="post-decimal-digits">
               <option>0</option>
               <option>1</option>
               <option>2</option>
               <option>3</option>
               <option>4</option>
+              <option>5</option>
             </select>
           </label>
           <label>

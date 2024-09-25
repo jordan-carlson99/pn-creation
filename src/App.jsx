@@ -66,7 +66,7 @@ function App() {
 
   function run() {
     let formData = getFormData(formRef);
-    // console.log(formData);
+    console.log(formData);
 
     let keys = formData[1];
     let combos = {};
@@ -144,12 +144,13 @@ function getFormData(formRef) {
   let prevField;
   let uniqueDelim = "";
   let eiaValues = [];
+  let preDecimalDigits;
+  let postDecimalDigits;
+
   const formData = new FormData(formRef.current);
 
   // ! This should not be iterated like this. It means unit has to come last for ranges
   for (const val of formData.entries()) {
-    // console.log(val);
-
     if (val[0].slice(0, 8).includes("fieldVal")) {
       if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
         valObj[val[0].split("fieldVal ")[1]].push(val[1]);
@@ -175,7 +176,9 @@ function getFormData(formRef) {
         prevVal,
         prevDesc,
         uniqueDelim,
-        eiaValues
+        eiaValues,
+        preDecimalDigits,
+        postDecimalDigits
       );
       valObj[prevField].pop();
       descObj[prevField].pop();
@@ -191,6 +194,10 @@ function getFormData(formRef) {
       }
     } else if (val[0].includes("eiaValue")) {
       eiaValues.push(val[1]);
+    } else if (val[0].includes("preDecimalDigits")) {
+      preDecimalDigits = val[1];
+    } else if (val[0].includes("postDecimalDigits")) {
+      postDecimalDigits = val[1];
     }
   }
   for (let params in valObj) {
@@ -273,10 +280,17 @@ function convertToCSV(inputObject) {
   return `${header}\n${rows.join("\n")}`;
 }
 
-function createRange(increment, value, description, delimeter, eiaValues) {
+function createRange(
+  increment,
+  value,
+  description,
+  delimeter,
+  eiaValues,
+  preDecimalDigits,
+  postDecimalDigits
+) {
   let arr = value.split("~");
   increment = parseFloat(increment);
-  // console.log(arr);
   let start = parseFloat(arr[0]);
   let end = parseFloat(arr[1]);
   let unit = arr[1].split(end)[1];
@@ -284,16 +298,44 @@ function createRange(increment, value, description, delimeter, eiaValues) {
   let descSuffix = description.split(end)[1] || description;
   let valArr = [];
   let descArr = [];
-  let eValueRange = eiaValueRange(eiaValues);
+
+  // Return all possible values based on the eia values selected
+  let eValueRange = eiaValueRange(
+    eiaValues,
+    preDecimalDigits,
+    postDecimalDigits
+  );
 
   // start + 1 since we already put the previous value on here in getFormData
   for (let i = start; i < end; i += increment) {
-    let roundedValue = i.toFixed(5);
+    // ! If you change this, change the toFixed value in in eiaValueRange aswell
+    let roundedValue = i.toFixed(6);
+
     if (eValueRange && eValueRange.includes(roundedValue)) {
+      let precedingZeroes = "";
+      const preChars = roundedValue.split(".")[0].length;
+      const postChars = roundedValue.split(".")[1].length;
+      const lastZero = roundedValue.split(".")[1].indexOf("0");
+
+      for (let i = preChars; i <= preDecimalDigits; i++) {
+        precedingZeroes += "0";
+      }
+
+      if (lastZero <= postDecimalDigits) {
+        roundedValue =
+          precedingZeroes + parseFloat(roundedValue).toFixed(postDecimalDigits);
+      } else {
+        roundedValue =
+          precedingZeroes + roundedValue.slice(0, preChars + lastZero + 1);
+      }
+      // console.log(
+      //   `preceeding chars is ${preChars} / ${preDecimalDigits} \npost chars is ${postChars} / ${postDecimalDigits}\n on ${roundedValue}`
+      // );
+
       if (delimeter) {
         roundedValue = roundedValue.split(".").join(delimeter);
       } else {
-        roundedValue = roundedValue + delimeter + "0";
+        roundedValue = roundedValue;
       }
       valArr.push(`${roundedValue}${unit}`);
       descArr.push(`${descPrefix} ${roundedValue} ${descSuffix}`);
@@ -323,7 +365,6 @@ function eiaValueRange(eiaValues) {
   if (eiaValues.includes("e192")) {
     values.push(...e192);
   }
-  console.log(values);
 
   if (values.length < 1) {
     return;
@@ -332,7 +373,7 @@ function eiaValueRange(eiaValues) {
   return values
     .map((val) => {
       return magnitudes.map((mag) => {
-        return (mag * val).toFixed(5);
+        return (mag * val).toFixed(6);
       });
     })
     .flat();
