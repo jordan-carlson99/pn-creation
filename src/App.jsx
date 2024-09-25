@@ -42,7 +42,6 @@ const e192 = [
   7.59, 7.68, 7.77, 7.87, 7.96, 8.06, 8.16, 8.25, 8.35, 8.45, 8.56, 8.66, 8.76,
   8.87, 8.98, 9.09, 9.2, 9.31, 9.42, 9.53, 9.65, 9.76, 9.88,
 ];
-(0.12).toFixed();
 function App() {
   const [fields, setFields] = useState(1);
   const [blobLink, setBlobLink] = useState("/");
@@ -144,7 +143,7 @@ function getFormData(formRef) {
   let prevDesc;
   let prevField;
   let uniqueDelim = "";
-  let eiaValue = null;
+  let eiaValues = [];
   const formData = new FormData(formRef.current);
 
   // ! This should not be iterated like this. It means unit has to come last for ranges
@@ -176,7 +175,7 @@ function getFormData(formRef) {
         prevVal,
         prevDesc,
         uniqueDelim,
-        eiaValue
+        eiaValues
       );
       valObj[prevField].pop();
       descObj[prevField].pop();
@@ -191,9 +190,7 @@ function getFormData(formRef) {
         uniqueDelim = val[1];
       }
     } else if (val[0].includes("eiaValue")) {
-      if (val[1] != "N/A") {
-        eiaValue = val[1];
-      }
+      eiaValues.push(val[1]);
     }
   }
   for (let params in valObj) {
@@ -204,8 +201,7 @@ function getFormData(formRef) {
     });
     obj[params] = arr;
   }
-
-  return [obj, keys, delimArr, eiaValue];
+  return [obj, keys, delimArr];
 }
 
 function generateCombinations(
@@ -277,7 +273,7 @@ function convertToCSV(inputObject) {
   return `${header}\n${rows.join("\n")}`;
 }
 
-function createRange(increment, value, description, delimeter, eiaValue) {
+function createRange(increment, value, description, delimeter, eiaValues) {
   let arr = value.split("~");
   increment = parseFloat(increment);
   // console.log(arr);
@@ -288,14 +284,12 @@ function createRange(increment, value, description, delimeter, eiaValue) {
   let descSuffix = description.split(end)[1] || description;
   let valArr = [];
   let descArr = [];
-  let eValueRange = eiaValueRange(eiaValue);
+  let eValueRange = eiaValueRange(eiaValues);
 
   // start + 1 since we already put the previous value on here in getFormData
   for (let i = start; i < end; i += increment) {
     let roundedValue = i.toFixed(5);
     if (eValueRange && eValueRange.includes(roundedValue)) {
-      console.log("this value exists in list: ", roundedValue);
-
       if (delimeter) {
         roundedValue = roundedValue.split(".").join(delimeter);
       } else {
@@ -303,31 +297,38 @@ function createRange(increment, value, description, delimeter, eiaValue) {
       }
       valArr.push(`${roundedValue}${unit}`);
       descArr.push(`${descPrefix} ${roundedValue} ${descSuffix}`);
-    } else {
-      console.log(`this value does not exist in this range: ${roundedValue}`);
     }
   }
   return [valArr, descArr];
 }
 
-function eiaValueRange(eiaValue) {
-  let values;
+function eiaValueRange(eiaValues) {
+  let values = [];
   let magnitudes = [0.001, 0.01, 0.1, 1, 10, 100];
-  if (eiaValue == "E6") {
-    values = e6;
-  } else if (eiaValue == "E12") {
-    values = e12;
-  } else if (eiaValue == "E24") {
-    values = e24;
-  } else if (eiaValue == "E48") {
-    values = e48;
-  } else if (eiaValue == "E96") {
-    values = e96;
-  } else if (eiaValue == "E192") {
-    values = e192;
-  } else {
+  if (eiaValues.includes("e6")) {
+    values.push(...e6);
+  }
+  if (eiaValues.includes("e12")) {
+    values.push(...e12);
+  }
+  if (eiaValues.includes("e24")) {
+    values.push(...e24);
+  }
+  if (eiaValues.includes("e48")) {
+    values.push(...e48);
+  }
+  if (eiaValues.includes("e96")) {
+    values.push(...e96);
+  }
+  if (eiaValues.includes("e192")) {
+    values.push(...e192);
+  }
+  console.log(values);
+
+  if (values.length < 1) {
     return;
   }
+
   return values
     .map((val) => {
       return magnitudes.map((mag) => {
