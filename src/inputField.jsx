@@ -36,7 +36,7 @@ export function InputField(props) {
         ></input>
       </div>
       {isRange && (
-        <>
+        <div className="range-options">
           <div className="delimiter-row">
             <input
               type="text"
@@ -170,7 +170,7 @@ export function InputField(props) {
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

@@ -390,25 +390,28 @@ function App() {
         <form id="pn-form" ref={formRef}>
           {fieldElements}
         </form>
-        <button type="button" className="addition-btn" onClick={subField}>
-          -
-        </button>
-        <button type="button" className="addition-btn" onClick={addField}>
-          +
-        </button>
       </div>
-      <div>
-        <button className="run-btn" type="button" onClick={run}>
-          Run
-        </button>
-        <button className="run-btn" type="button" onClick={resetField}>
-          Reset
-        </button>
+      <div className="generation-controls">
+        <div>
+          <button type="button" className="addition-btn" onClick={subField}>
+            -
+          </button>
+
+          <button className="run-btn" type="button" onClick={run}>
+            Run
+          </button>
+          <button className="run-btn" type="button" onClick={resetField}>
+            Reset
+          </button>
+          <button type="button" className="addition-btn" onClick={addField}>
+            +
+          </button>
+        </div>
+        <a href={blobLink} download="part_data.csv">
+          Download CSV
+        </a>
+        <h3>{exampleText}</h3>
       </div>
-      <a href={blobLink} download="part_data.csv">
-        Download CSV
-      </a>
-      <h3>{exampleText}</h3>
     </>
   );
 }

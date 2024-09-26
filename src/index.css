@@ -6,6 +6,9 @@
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
+  /* background-color: #f9f9f9; */
+  /* max-width: 100dvw; */
+  border: 1px solid blue;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -18,8 +21,8 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  min-width: 100dvh;
+  min-height: 100dvh;
 }
 
 button:hover {
@@ -57,14 +60,32 @@ button:focus-visible {
 
 } */
 
+/* @keyframes openRangeOptions {
+  from {
+    background-color: #242424;
+  }
+  to {
+    background-color: #213547;
+  }
+} */
+
+.range-options {
+  width: 100%;
+  background-color: #213547;
+  animation-name: openRangeOptions;
+  animation-duration: 1s;
+}
+
 #pn-container {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 #pn-form {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .eia-container {
@@ -94,11 +115,6 @@ button:focus-visible {
   justify-content: space-between;
 }
 
-.column {
-  display: flex;
-  flex-direction: column;
-}
-
 .digit-select-container {
   /* justify-self: end; */
   display: flex;
@@ -117,6 +133,16 @@ button:focus-visible {
 
 .validation-dropdown {
   width: 100%;
+}
+
+.generation-controls {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  width: 100dvw;
+  background-color: #213547;
+  bottom: 0;
 }
 
 @media (prefers-color-scheme: light) {
