@@ -53,7 +53,7 @@ button:focus-visible {
   align-items: start;
 }
 
-/* .delimeter-input {
+/* .delimiter-input {
 
 } */
 
@@ -108,7 +108,7 @@ button:focus-visible {
   justify-content: space-between;
 }
 
-.delimeter-row {
+.delimiter-row {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

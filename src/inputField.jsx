@@ -37,12 +37,12 @@ export function InputField(props) {
       </div>
       {isRange && (
         <>
-          <div className="delimeter-row">
+          <div className="delimiter-row">
             <input
               type="text"
-              placeholder="Delimeter"
+              placeholder="Delimiter"
               name="rangeDelim"
-              className="delimeter-input"
+              className="delimiter-input"
             ></input>
             <select
               name="validateEIA"

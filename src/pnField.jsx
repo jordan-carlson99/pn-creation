@@ -47,8 +47,8 @@ export function PNField(props) {
         </button>
       </div>
       {props.col !== props.total - 1 && (
-        <div className="delimeter-container">
-          <select name="delimeter">
+        <div className="delimiter-container">
+          <select name="delimiter">
             <option>(none)</option>
             <option>-</option>
           </select>

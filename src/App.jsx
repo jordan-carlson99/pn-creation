@@ -122,7 +122,7 @@ function App() {
         }
         prevDesc = val[1];
         prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].includes("delimeter")) {
+      } else if (val[0].includes("delimiter")) {
         delimArr.push(val[1]);
         prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
       } else if (val[0].includes("unit")) {
@@ -173,11 +173,11 @@ function App() {
     currentPN,
     currentDetails,
     returnObject,
-    delimeters
+    delimiters
   ) {
     if (index == keys.length) {
       // map out delimiters to pn by appending to their string before joining
-      delimeters.forEach((d, i) => {
+      delimiters.forEach((d, i) => {
         if (d != "(none)") {
           // so we dont keep adding "-" everytime we get to the same pn
           if (
@@ -209,7 +209,7 @@ function App() {
           currentPN,
           updatedDetails,
           returnObject,
-          delimeters
+          delimiters
         );
         currentPN.pop();
         delete currentDetails[currentKey];
@@ -238,7 +238,7 @@ function App() {
     increment,
     value,
     description,
-    delimeter,
+    delimiter,
     eiaValues,
     preDecimalDigits,
     postDecimalDigits
@@ -279,8 +279,8 @@ function App() {
         );
 
         let delimitedRoundedValue;
-        if (delimeter) {
-          delimitedRoundedValue = roundedValue.split(".").join(delimeter);
+        if (delimiter) {
+          delimitedRoundedValue = roundedValue.split(".").join(delimiter);
         } else {
           delimitedRoundedValue = roundedValue;
         }
@@ -294,8 +294,8 @@ function App() {
         );
 
         let delimitedRoundedValue;
-        if (delimeter) {
-          delimitedRoundedValue = roundedValue.split(".").join(delimeter);
+        if (delimiter) {
+          delimitedRoundedValue = roundedValue.split(".").join(delimiter);
         } else {
           delimitedRoundedValue = roundedValue;
         }
@@ -362,7 +362,7 @@ function App() {
     return roundedValue;
   }
 
-  // the input, the current iteration, the working set, the working details, the object writing to, an array of delimeters to map
+  // the input, the current iteration, the working set, the working details, the object writing to, an array of delimiters to map
 
   const fieldElements = [];
   for (let i = 0; i < fields; i++) {
