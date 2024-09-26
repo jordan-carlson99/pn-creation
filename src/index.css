@@ -41,14 +41,21 @@ button:focus-visible {
   margin-bottom: 5px;
 }
 
-.input-field {
+.field-container {
   display: flex;
-  flex-direction: row;
 }
 
-.delimeter-container {
-  align-self: center;
+.input-field {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: start;
+  align-items: start;
 }
+
+/* .delimeter-input {
+
+} */
 
 #pn-container {
   display: flex;
@@ -58,6 +65,58 @@ button:focus-visible {
 #pn-form {
   display: flex;
   flex-direction: row;
+}
+
+.eia-container {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  padding: 5px;
+  /* border: 1px solid red; */
+  justify-content: space-evenly;
+}
+
+.digit-container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  padding: 5px;
+  justify-content: space-evenly;
+  padding-left: 15px;
+  /* border: 1px solid blue; */
+}
+
+.options-container {
+  display: flex;
+  flex-direction: column;
+  /* border: 1px solid purple; */
+  width: 100%;
+  justify-content: space-between;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.digit-select-container {
+  /* justify-self: end; */
+  display: flex;
+  /* border: 1px solid white; */
+  align-self: flex-start;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.delimeter-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 90%;
+}
+
+.validation-dropdown {
+  width: 100%;
 }
 
 @media (prefers-color-scheme: light) {
