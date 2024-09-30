@@ -4,6 +4,7 @@ import { InputField } from "./inputField";
 export function PNField(props) {
   const [rows, setRows] = useState(1);
   const [fieldName, setFieldName] = useState("");
+  const [isRange, setIsRange] = useState(false);
 
   const addRow = () => {
     setRows(rows + 1);
@@ -25,19 +26,32 @@ export function PNField(props) {
         setExample={props.setExample}
         validation={props.validation}
         setValidation={props.setValidation}
+        isRange={isRange}
       />
     );
   }
 
+  const handleSetRange = (e) => {
+    setIsRange(e.target.checked);
+  };
+
   return (
     <>
       <div className="column" key={props.col}>
-        <input
-          type="text"
-          onChange={changeName}
-          placeholder="Field Name"
-          className="field-name"
-        ></input>
+        <div>
+          <input
+            type="text"
+            onChange={changeName}
+            placeholder="Field Name"
+            className="field-name"
+          ></input>
+          <label>Range</label>
+          <input
+            type="checkbox"
+            className="range-check"
+            onChange={handleSetRange}
+          ></input>
+        </div>
         {rowElems}
         <button type="button" className="addition-btn" onClick={subRow}>
           -
