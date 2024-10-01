@@ -23,8 +23,6 @@ export function PNField(props) {
         col={props.col}
         fieldName={fieldName}
         setExample={props.setExample}
-        validation={props.validation}
-        setValidation={props.setValidation}
       />
     );
   }

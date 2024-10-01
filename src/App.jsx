@@ -148,6 +148,8 @@ function App() {
           uniqueDelim = val[1];
         }
       } else if (val[0].includes("eiaValue")) {
+        console.log(val[1]);
+
         eiaValues.push(val[1]);
       } else if (val[0].includes("preDecimalDigits")) {
         preDecimalDigits = val[1];
@@ -254,24 +256,14 @@ function App() {
     let eValueRange;
 
     // Return all possible values based on the eia values selected if eia validation selected
-    if (validation === "EIA") {
-      eValueRange = eiaValueRange(
-        eiaValues,
-        preDecimalDigits,
-        postDecimalDigits
-      );
-    }
+    eValueRange = eiaValueRange(eiaValues, preDecimalDigits, postDecimalDigits);
 
     // start + 1 since we already put the previous value on here in getFormData
     for (let i = start; i < end; i += increment) {
       // ! If you change this, change the toFixed value in in eiaValueRange aswell
       let roundedValue = i.toFixed(6);
 
-      if (
-        validation === "EIA" &&
-        eValueRange &&
-        eValueRange.includes(roundedValue)
-      ) {
+      if (eValueRange && eValueRange.includes(roundedValue)) {
         roundedValue = formatNumbering(
           roundedValue,
           preDecimalDigits,
@@ -286,7 +278,7 @@ function App() {
         }
         valArr.push(`${delimitedRoundedValue}${unit}`);
         descArr.push(`${roundedValue} ${descSuffix}`);
-      } else if (validation === "") {
+      } else if (eValueRange == undefined) {
         roundedValue = formatNumbering(
           roundedValue,
           preDecimalDigits,
@@ -367,14 +359,7 @@ function App() {
   const fieldElements = [];
   for (let i = 0; i < fields; i++) {
     fieldElements.push(
-      <PNField
-        key={i}
-        col={i}
-        total={fields}
-        setExample={setExample}
-        validation={validation}
-        setValidation={setValidation}
-      />
+      <PNField key={i} col={i} total={fields} setExample={setExample} />
     );
   }
   useEffect(() => {

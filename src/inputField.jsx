@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 
 export function InputField(props) {
   const [isRange, setIsRange] = useState(false);
+  const [validation, setValidation] = useState("EIA");
 
   const checkForRangeAndSetExample = (e) => {
     props.setExample(e.target.value);
@@ -17,7 +18,7 @@ export function InputField(props) {
   };
 
   const handleValidation = (e) => {
-    props.setValidation(e.target.value);
+    setValidation(e.target.value);
   };
 
   return (
@@ -47,7 +48,7 @@ export function InputField(props) {
             <select
               name="validateEIA"
               className="validation-dropdown"
-              value={props.validation}
+              value={validation}
               onChange={handleValidation}
             >
               <option value="EIA">EIA Validation</option>
@@ -55,7 +56,7 @@ export function InputField(props) {
             </select>
           </div>
           <div className="options-container">
-            {props.validation == "EIA" && (
+            {validation == "EIA" && (
               <div className="eia-container">
                 <label htmlFor="eia-e6">
                   E6
