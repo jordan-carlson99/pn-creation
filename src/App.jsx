@@ -42,12 +42,53 @@ const e192 = [
   7.59, 7.68, 7.77, 7.87, 7.96, 8.06, 8.16, 8.25, 8.35, 8.45, 8.56, 8.66, 8.76,
   8.87, 8.98, 9.09, 9.2, 9.31, 9.42, 9.53, 9.65, 9.76, 9.88,
 ];
+
+const defaultFields = [
+  "PN",
+  "Series Name",
+  "Case Size",
+  "Power Code",
+  "TCR",
+  "Resistance",
+  "Resistance Tolerance",
+  "Packaging",
+  "Power (Watts)",
+  "Composition",
+  "Features",
+  "Operating Temperature",
+  "Package/Case",
+  "Supplier Device Package",
+  "Ratings",
+  "Size / Dimensions",
+  "Number of Terminations",
+  "Other Part Numbers",
+  "MOQ",
+  "Order Multiple",
+  "Category",
+  "Sub-Category",
+  "Packaging",
+  "Is The Part Static Sensitive",
+  "MSL (moisture sensitivity level)",
+  "RoHS Status",
+  "CA Prop 65",
+  "HTS (Harmonized Tariff Schedule)",
+  "ECCN Number",
+  "Country of Origin",
+  "Cage Code",
+  "Shelf Life Requirements",
+  "Special Handling Instructions",
+  "Product Life Cycle Status",
+  "NCNR",
+  "Lead Time (Weeks)",
+  "Lead Time (Days)",
+  "Weight UOM",
+];
+
 function App() {
   const [fields, setFields] = useState(1);
   const [blobLink, setBlobLink] = useState("/");
   const [example, setExample] = useState(null);
   const [exampleText, setExampleText] = useState(null);
-  const [validation, setValidation] = useState("EIA");
 
   const formRef = useRef(null);
 
@@ -63,6 +104,10 @@ function App() {
 
   const resetField = () => {
     setFields(0);
+  };
+
+  const addDefaultTemplate = () => {
+    console.log("clicked");
   };
 
   function run() {
@@ -408,6 +453,13 @@ function App() {
           </button>
           <button type="button" className="addition-btn" onClick={addField}>
             +
+          </button>
+          <button
+            type="button"
+            className="template-input"
+            onClick={addDefaultTemplate}
+          >
+            Add Default
           </button>
         </div>
         <a href={blobLink} download="part_data.csv">

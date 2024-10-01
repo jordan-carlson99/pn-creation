@@ -1,10 +1,11 @@
 #root {
-  /* max-width: 1280px; */
   width: 100dvw;
-  height: 100dvh;
+  height: fit-content;
   margin: 0 auto;
   padding: 2rem;
+  padding-bottom: 10rem;
   text-align: center;
+  display: flex;
 }
 
 .card {
