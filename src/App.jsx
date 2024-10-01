@@ -68,6 +68,8 @@ function App() {
   function run() {
     let formData = getFormData(formRef);
 
+    // console.log(formData);
+
     let keys = formData[1];
     let combos = {};
     generateCombinations(
@@ -148,8 +150,6 @@ function App() {
           uniqueDelim = val[1];
         }
       } else if (val[0].includes("eiaValue")) {
-        console.log(val[1]);
-
         eiaValues.push(val[1]);
       } else if (val[0].includes("preDecimalDigits")) {
         preDecimalDigits = val[1];
@@ -169,52 +169,69 @@ function App() {
   }
 
   function generateCombinations(
-    obj,
-    keys,
-    index,
-    currentPN,
-    currentDetails,
-    returnObject,
-    delimiters
+    obj, // The input object containing key-value pairs (each value is an array of objects)
+    keys, // The array of keys to iterate over
+    index, // The current index in the keys array (to control recursion)
+    currentPN, // The current part number (array form) being built as we go through the keys
+    currentDetails, // The current details object to store values associated with the current key
+    // ! How can we turn return object into an array of objects
+    returnObject, // The object that will contain all the generated combinations
+    delimiters // Array of delimiters to be added between part numbers if needed
   ) {
     if (index == keys.length) {
-      // map out delimiters to pn by appending to their string before joining
+      // Base case: If we've gone through all the keys
+
+      // Loop through the delimiters to append them to the part number (PN) string
       delimiters.forEach((d, i) => {
         if (d != "(none)") {
-          // so we dont keep adding "-" everytime we get to the same pn
+          // If the delimiter is not "(none)", we add it to the part number
+
+          // Ensure the delimiter is not already at the end of the current part number
           if (
             !currentPN[i]
               .slice(currentPN[i].length - 1, currentPN[i].length)
               .includes(d)
           ) {
-            currentPN[i] = currentPN[i] + d;
+            currentPN[i] = currentPN[i] + d; // Append the delimiter to the part number
           }
         }
       });
-      // append to combos object
-      returnObject[currentPN.join("")] = Object.assign({}, currentDetails);
+      // console.log(currentPN, currentPN.join(""));
+
+      // Store the current part number and its corresponding details in the return object
+      // ! This is overwriting PNs with non pn value but unique details assigned
+      returnObject[currentPN.join("")] = Object.assign({}, currentDetails); // Combine part number into a string and copy current details
+      // console.log(returnObject);
     } else {
-      const currentKey = keys[index];
-      const innerArray = obj[currentKey];
+      // Recursive case: If we haven't gone through all the keys yet
+
+      const currentKey = keys[index]; // Get the current key to work with
+      const innerArray = obj[currentKey]; // Get the array of objects associated with the current key
+
+      // Loop through each object in the inner array
       for (const innerObj of innerArray) {
-        const innerKey = Object.keys(innerObj)[0];
-        const innerVal = Object.values(innerObj)[0];
-        currentPN.push(innerKey);
+        const innerKey = Object.keys(innerObj)[0]; // Get the key of the current object in the array
+        const innerVal = Object.values(innerObj)[0]; // Get the value of the current object
 
-        const updatedDetails = Object.assign({}, currentDetails);
-        updatedDetails[currentKey] = innerVal;
+        currentPN.push(innerKey); // Add the current key to the part number array
 
+        const updatedDetails = Object.assign({}, currentDetails); // Create a new copy of the current details object
+        updatedDetails[currentKey] = innerVal; // Add the value of the current key to the details
+
+        // Recursively call the function to go deeper into the next key
         generateCombinations(
           obj,
           keys,
-          index + 1,
+          index + 1, // Move to the next key
           currentPN,
           updatedDetails,
           returnObject,
           delimiters
         );
-        currentPN.pop();
-        delete currentDetails[currentKey];
+
+        // Backtrack: remove the last added part number and detail to explore other combinations
+        currentPN.pop(); // Remove the last part of the part number
+        delete currentDetails[currentKey]; // Remove the last key from the details
       }
     }
   }
