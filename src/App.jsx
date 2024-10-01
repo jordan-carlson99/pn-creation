@@ -71,7 +71,7 @@ function App() {
     // console.log(formData);
 
     let keys = formData[1];
-    let combos = {};
+    let combos = [];
     generateCombinations(
       // field values
       formData[0],
@@ -174,8 +174,7 @@ function App() {
     index, // The current index in the keys array (to control recursion)
     currentPN, // The current part number (array form) being built as we go through the keys
     currentDetails, // The current details object to store values associated with the current key
-    // ! How can we turn return object into an array of objects
-    returnObject, // The object that will contain all the generated combinations
+    returnArray, // The object that will contain all the generated combinations
     delimiters // Array of delimiters to be added between part numbers if needed
   ) {
     if (index == keys.length) {
@@ -199,8 +198,9 @@ function App() {
       // console.log(currentPN, currentPN.join(""));
 
       // Store the current part number and its corresponding details in the return object
-      // ! This is overwriting PNs with non pn value but unique details assigned
-      returnObject[currentPN.join("")] = Object.assign({}, currentDetails); // Combine part number into a string and copy current details
+      returnArray.push({
+        [currentPN.join("")]: Object.assign({}, currentDetails),
+      }); // Combine part number into a string and copy current details then push that into return array
       // console.log(returnObject);
     } else {
       // Recursive case: If we haven't gone through all the keys yet
@@ -225,7 +225,7 @@ function App() {
           index + 1, // Move to the next key
           currentPN,
           updatedDetails,
-          returnObject,
+          returnArray,
           delimiters
         );
 
@@ -236,20 +236,21 @@ function App() {
     }
   }
 
-  function convertToCSV(inputObject) {
+  function convertToCSV(inputArray) {
     let header;
-    for (let pn in inputObject) {
-      // console.log(pn);
-      header = "PN," + Object.keys(inputObject[pn]).join(",");
-      // console.log(header);
-    }
-    const rows = Object.entries(inputObject).map(([key, value]) => {
-      const values = Object.values(value)
-        .map((val) => `"${val}"`)
-        .join(",");
-      return `"${key}",${values}`;
+    let rows = [];
+    inputArray.forEach((inputObject) => {
+      for (let pn in inputObject) {
+        header = "PN," + Object.keys(inputObject[pn]).join(",");
+      }
+      const row = Object.entries(inputObject).map(([key, value]) => {
+        const values = Object.values(value)
+          .map((val) => `"${val}"`)
+          .join(",");
+        return `"${key}",${values}`;
+      });
+      rows.push(row);
     });
-
     return `${header}\n${rows.join("\n")}`;
   }
 
@@ -381,8 +382,8 @@ function App() {
   }
   useEffect(() => {
     let data = run();
-    if (data) {
-      setExampleText(Object.keys(data)[0]);
+    if (data[0]) {
+      setExampleText(Object.keys(data[0])[0]);
     }
   }, [example]);
 
