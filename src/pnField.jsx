@@ -27,6 +27,8 @@ export function PNField(props) {
     );
   }
 
+  // console.log(props.field);
+
   return (
     <>
       <div className="column" key={props.col}>
@@ -35,6 +37,7 @@ export function PNField(props) {
           onChange={changeName}
           placeholder="Field Name"
           className="field-name"
+          value={props.field ? props.field : ""}
         ></input>
         {rowElems}
         <button type="button" className="addition-btn" onClick={subRow}>

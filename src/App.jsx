@@ -43,8 +43,7 @@ const e192 = [
   8.87, 8.98, 9.09, 9.2, 9.31, 9.42, 9.53, 9.65, 9.76, 9.88,
 ];
 
-const defaultFields = [
-  "PN",
+const defaultTemplate = [
   "Series Name",
   "Case Size",
   "Power Code",
@@ -89,6 +88,7 @@ function App() {
   const [blobLink, setBlobLink] = useState("/");
   const [example, setExample] = useState(null);
   const [exampleText, setExampleText] = useState(null);
+  const [template, setTemplate] = useState([]);
 
   const formRef = useRef(null);
 
@@ -104,10 +104,11 @@ function App() {
 
   const resetField = () => {
     setFields(0);
+    setTemplate([]);
   };
 
-  const addDefaultTemplate = () => {
-    console.log("clicked");
+  const addTemplate = () => {
+    setTemplate(defaultTemplate);
   };
 
   function run() {
@@ -128,6 +129,7 @@ function App() {
       formData[2],
       formData[3]
     );
+    const encoder = new TextEncoder();
     let csv = convertToCSV(combos);
     const blob = new Blob([csv], { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
@@ -284,6 +286,8 @@ function App() {
   function convertToCSV(inputArray) {
     let header;
     let rows = [];
+    // Adding this tells excel its encoded in utf8 (removes weird character artefacts)
+    const BOM = "\uFEFF";
     inputArray.forEach((inputObject) => {
       for (let pn in inputObject) {
         header = "PN," + Object.keys(inputObject[pn]).join(",");
@@ -296,7 +300,7 @@ function App() {
       });
       rows.push(row);
     });
-    return `${header}\n${rows.join("\n")}`;
+    return `${BOM}${header}\n${rows.join("\n")}`;
   }
 
   function createRange(
@@ -420,10 +424,30 @@ function App() {
   // the input, the current iteration, the working set, the working details, the object writing to, an array of delimiters to map
 
   const fieldElements = [];
-  for (let i = 0; i < fields; i++) {
-    fieldElements.push(
-      <PNField key={i} col={i} total={fields} setExample={setExample} />
-    );
+  if (template.length > 0) {
+    template.forEach((field, i) => {
+      fieldElements.push(
+        <PNField
+          key={i}
+          col={i}
+          total={fields}
+          setExample={setExample}
+          field={field}
+        />
+      );
+    });
+  } else {
+    for (let i = 0; i < fields; i++) {
+      fieldElements.push(
+        <PNField
+          key={i}
+          col={i}
+          total={fields}
+          setExample={setExample}
+          template={template}
+        />
+      );
+    }
   }
   useEffect(() => {
     let data = run();
@@ -457,7 +481,7 @@ function App() {
           <button
             type="button"
             className="template-input"
-            onClick={addDefaultTemplate}
+            onClick={addTemplate}
           >
             Add Default
           </button>
