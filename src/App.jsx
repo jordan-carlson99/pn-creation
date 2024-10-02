@@ -65,7 +65,6 @@ const defaultTemplate = [
   "Order Multiple",
   "Category",
   "Sub-Category",
-  "Packaging",
   "Is The Part Static Sensitive",
   "MSL (moisture sensitivity level)",
   "RoHS Status",
@@ -84,32 +83,32 @@ const defaultTemplate = [
 ];
 
 function App() {
-  const [fields, setFields] = useState(1);
+  const [fields, setFields] = useState([""]);
   const [blobLink, setBlobLink] = useState("/");
   const [example, setExample] = useState(null);
   const [exampleText, setExampleText] = useState(null);
-  const [template, setTemplate] = useState([]);
 
   const formRef = useRef(null);
 
   const addField = () => {
-    setFields(fields + 1);
+    setFields([...fields, ""]);
   };
 
   const subField = () => {
-    if (fields > 0) {
-      setFields(fields - 1);
+    if (fields.length > 0) {
+      setFields(fields.slice(0, fields.length - 1));
     }
   };
 
   const resetField = () => {
-    setFields(0);
-    setTemplate([]);
+    setFields([""]);
   };
 
   const addTemplate = () => {
-    setTemplate(defaultTemplate);
+    setFields(defaultTemplate);
   };
+
+  const addMetadata = () => {};
 
   function run() {
     let formData = getFormData(formRef);
@@ -129,7 +128,6 @@ function App() {
       formData[2],
       formData[3]
     );
-    const encoder = new TextEncoder();
     let csv = convertToCSV(combos);
     const blob = new Blob([csv], { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
@@ -337,6 +335,10 @@ function App() {
           postDecimalDigits
         );
 
+        if (!roundedValue.includes(".")) {
+          roundedValue += ".";
+        }
+
         let delimitedRoundedValue;
         if (delimiter) {
           delimitedRoundedValue = roundedValue.split(".").join(delimiter);
@@ -351,6 +353,10 @@ function App() {
           preDecimalDigits,
           postDecimalDigits
         );
+
+        if (!roundedValue.includes(".")) {
+          roundedValue += ".";
+        }
 
         let delimitedRoundedValue;
         if (delimiter) {
@@ -367,7 +373,10 @@ function App() {
 
   function eiaValueRange(eiaValues) {
     let values = [];
-    let magnitudes = [0.001, 0.01, 0.1, 1, 10, 100];
+    let magnitudes = [
+      0.001, 0.01, 0.1, 1, 10, 100, 1000, 10000, 100000, 1000000, 10000000,
+      100000000,
+    ];
     if (eiaValues.includes("e6")) {
       values.push(...e6);
     }
@@ -424,31 +433,20 @@ function App() {
   // the input, the current iteration, the working set, the working details, the object writing to, an array of delimiters to map
 
   const fieldElements = [];
-  if (template.length > 0) {
-    template.forEach((field, i) => {
-      fieldElements.push(
-        <PNField
-          key={i}
-          col={i}
-          total={fields}
-          setExample={setExample}
-          field={field}
-        />
-      );
-    });
-  } else {
-    for (let i = 0; i < fields; i++) {
-      fieldElements.push(
-        <PNField
-          key={i}
-          col={i}
-          total={fields}
-          setExample={setExample}
-          template={template}
-        />
-      );
-    }
-  }
+  fields.forEach((field, i) => {
+    fieldElements.push(
+      <PNField
+        key={i}
+        col={i}
+        total={fields.length}
+        setExample={setExample}
+        field={field}
+        setFields={setFields}
+        fields={fields}
+      />
+    );
+  });
+
   useEffect(() => {
     let data = run();
     if (data[0]) {
@@ -485,8 +483,15 @@ function App() {
           >
             Add Default
           </button>
+          <button
+            type="button"
+            className="template-addition"
+            onClick={addMetadata}
+          >
+            Add Metadata
+          </button>
         </div>
-        <a href={blobLink} download="part_data.csv">
+        <a href={blobLink} download={`pn_creation-${exampleText}.csv`}>
           Download CSV
         </a>
         <h3>{exampleText}</h3>

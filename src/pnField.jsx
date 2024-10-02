@@ -1,9 +1,16 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { InputField } from "./inputField";
 
 export function PNField(props) {
   const [rows, setRows] = useState(1);
   const [fieldName, setFieldName] = useState("");
+
+  // props.field given to field name on mount
+  useEffect(() => {
+    if (props.field) {
+      setFieldName(props.field);
+    }
+  }, [props.field]);
 
   const addRow = () => {
     setRows(rows + 1);
@@ -23,11 +30,10 @@ export function PNField(props) {
         col={props.col}
         fieldName={fieldName}
         setExample={props.setExample}
+        // defaultValue={props.defaultValue}
       />
     );
   }
-
-  // console.log(props.field);
 
   return (
     <>
@@ -37,7 +43,7 @@ export function PNField(props) {
           onChange={changeName}
           placeholder="Field Name"
           className="field-name"
-          value={props.field ? props.field : ""}
+          value={fieldName}
         ></input>
         {rowElems}
         <button type="button" className="addition-btn" onClick={subRow}>
