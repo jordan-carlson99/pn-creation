@@ -5,6 +5,7 @@ export function InputField(props) {
   const [validation, setValidation] = useState("EIA");
   const [significantDigitValidation, setSignificantDigitValidation] =
     useState("significantDigit");
+  const [desc, setDesc] = useState("");
 
   const checkForRangeAndSetExample = (e) => {
     props.setExample(e.target.value);
@@ -27,6 +28,16 @@ export function InputField(props) {
     setSignificantDigitValidation(e.target.value);
   };
 
+  const changeDesc = (e) => {
+    setDesc(e.target.value);
+  };
+
+  useEffect(() => {
+    if (props.defaultDesc) {
+      setDesc(props.defaultDesc);
+    }
+  }, [props.defaultDesc]);
+
   return (
     <div className="input-field">
       <div className="field-container">
@@ -40,6 +51,8 @@ export function InputField(props) {
           name={`descVal ${props.col}-${props.fieldName}`}
           type="text"
           placeholder={isRange ? "Unit" : "Description"}
+          value={desc}
+          onChange={changeDesc}
         ></input>
       </div>
 

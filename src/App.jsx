@@ -43,47 +43,27 @@ const e192 = [
   8.87, 8.98, 9.09, 9.2, 9.31, 9.42, 9.53, 9.65, 9.76, 9.88,
 ];
 
-const defaultTemplate = [
-  "Series Name",
-  "Case Size",
-  "Power Code",
-  "TCR",
-  "Resistance",
-  "Resistance Tolerance",
-  "Packaging",
-  "Power (Watts)",
-  "Composition",
-  "Features",
-  "Operating Temperature",
-  "Package/Case",
-  "Supplier Device Package",
-  "Ratings",
-  "Size / Dimensions",
-  "Number of Terminations",
-  "Other Part Numbers",
-  "MOQ",
-  "Order Multiple",
-  "Category",
-  "Sub-Category",
-  "Is The Part Static Sensitive",
-  "MSL (moisture sensitivity level)",
-  "RoHS Status",
-  "CA Prop 65",
-  "HTS (Harmonized Tariff Schedule)",
-  "ECCN Number",
-  "Country of Origin",
-  "Cage Code",
-  "Shelf Life Requirements",
-  "Special Handling Instructions",
-  "Product Life Cycle Status",
-  "NCNR",
-  "Lead Time (Weeks)",
-  "Lead Time (Days)",
-  "Weight UOM",
+const resistorDefaults = [
+  { Category: "Resistors" },
+  { "Sub-Category": "Chip Resistors - Surface Mount" },
+  { Packaging: "Tape & Reel (TR)" },
+  { "Is The Part Static Sensitive": "Static Not Applicable" },
+  { "MSL (moisture sensitivity level)": "1- Unlimited" },
+  { "RoHS Status": "RoHS3 Compliant" },
+  { "CA Prop 65": "Compliant" },
+  { "ECCN Number": "Null" },
+  { "Country of Origin": "Taiwan" },
+  { "Shelf Life Requirements": "5+ Years" },
+  { "Special Handling Instructions": "None" },
+  { "Product Life Cycle Status": "Active" },
+  { NCNR: "Yes" },
+  { "Weight UOM": "Milligrams" },
+  { "HTS (Harmonized Tariff Schedule)": "8533.10.0042" },
+  { "Cage Code": "07WP9" },
 ];
 
 function App() {
-  const [fields, setFields] = useState([""]);
+  const [fields, setFields] = useState([{ "": "" }]);
   const [blobLink, setBlobLink] = useState("/");
   const [example, setExample] = useState(null);
   const [exampleText, setExampleText] = useState(null);
@@ -91,7 +71,7 @@ function App() {
   const formRef = useRef(null);
 
   const addField = () => {
-    setFields([...fields, ""]);
+    setFields([...fields, { "": "" }]);
   };
 
   const subField = () => {
@@ -101,19 +81,19 @@ function App() {
   };
 
   const resetField = () => {
-    setFields([""]);
+    setFields([{ "": "" }]);
   };
 
   const addTemplate = () => {
-    setFields(defaultTemplate);
+    // setFields(defaultTemplate);
   };
 
-  const addMetadata = () => {};
+  const addMetadata = () => {
+    setFields([...fields, ...resistorDefaults]);
+  };
 
   function run() {
     let formData = getFormData(formRef);
-
-    // console.log(formData);
 
     let keys = formData[1];
     let combos = [];
@@ -472,17 +452,20 @@ function App() {
 
   const fieldElements = [];
   fields.forEach((field, i) => {
-    fieldElements.push(
-      <PNField
-        key={i}
-        col={i}
-        total={fields.length}
-        setExample={setExample}
-        field={field}
-        setFields={setFields}
-        fields={fields}
-      />
-    );
+    for (let param in field) {
+      fieldElements.push(
+        <PNField
+          key={`pnfield-${i}`}
+          col={i}
+          total={fields.length}
+          setExample={setExample}
+          field={param}
+          setFields={setFields}
+          fields={fields}
+          defaultDesc={field[param]}
+        />
+      );
+    }
   });
 
   useEffect(() => {

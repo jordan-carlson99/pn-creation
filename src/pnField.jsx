@@ -30,7 +30,8 @@ export function PNField(props) {
         col={props.col}
         fieldName={fieldName}
         setExample={props.setExample}
-        // defaultValue={props.defaultValue}
+        defaultDesc={props.defaultDesc}
+        key={`pnrow-${i}`}
       />
     );
   }
