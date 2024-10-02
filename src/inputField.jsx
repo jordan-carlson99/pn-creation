@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 export function InputField(props) {
   const [isRange, setIsRange] = useState(false);
   const [validation, setValidation] = useState("EIA");
+  const [significantDigitValidation, setSignificantDigitValidation] =
+    useState("significantDigit");
 
   const checkForRangeAndSetExample = (e) => {
     props.setExample(e.target.value);
@@ -21,6 +23,10 @@ export function InputField(props) {
     setValidation(e.target.value);
   };
 
+  const handleDigitFormatting = (e) => {
+    setSignificantDigitValidation(e.target.value);
+  };
+
   return (
     <div className="input-field">
       <div className="field-container">
@@ -36,6 +42,7 @@ export function InputField(props) {
           placeholder={isRange ? "Unit" : "Description"}
         ></input>
       </div>
+
       {isRange && (
         <div className="range-options">
           <div className="delimiter-row">
@@ -53,6 +60,16 @@ export function InputField(props) {
             >
               <option value="EIA">EIA Validation</option>
               <option value="">No validation</option>
+            </select>
+            {/* <label>Digit Formatting</label> */}
+            <select
+              onChange={handleDigitFormatting}
+              name="digitFormatting"
+              className="digit-formatting-dropdown"
+              value={significantDigitValidation}
+            >
+              <option value="significantDigit">Significant Digit</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
           <div className="options-container">
@@ -122,37 +139,43 @@ export function InputField(props) {
             )}
 
             <div className="digit-container">
-              <div className="digit-select-container">
-                <label>Pre Decimal Digits</label>
-                <select
-                  name="preDecimalDigits"
-                  id="pre-decimal-digits"
-                  onChange={checkForRangeAndSetExample}
-                  className="digit-select"
-                >
-                  <option>0</option>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                </select>
-              </div>
-              <div className="digit-select-container">
-                <label>Post Decimal Digits</label>
-                <select
-                  name="postDecimalDigits"
-                  id="post-decimal-digits"
-                  onChange={checkForRangeAndSetExample}
-                  className="digit-select"
-                >
-                  <option>0</option>
-                  <option>1</option>
-                  <option>2</option>
-                  <option>3</option>
-                  <option>4</option>
-                  <option>5</option>
-                </select>
-              </div>
+              {significantDigitValidation === "significantDigit" ? (
+                <></>
+              ) : (
+                <>
+                  <div className="digit-select-container">
+                    <label>Pre Decimal Digits</label>
+                    <select
+                      name="preDecimalDigits"
+                      id="pre-decimal-digits"
+                      onChange={checkForRangeAndSetExample}
+                      className="digit-select"
+                    >
+                      <option>0</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                    </select>
+                  </div>
+                  <div className="digit-select-container">
+                    <label>Post Decimal Digits</label>
+                    <select
+                      name="postDecimalDigits"
+                      id="post-decimal-digits"
+                      onChange={checkForRangeAndSetExample}
+                      className="digit-select"
+                    >
+                      <option>0</option>
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                    </select>
+                  </div>
+                </>
+              )}
               <div className="digit-select-container">
                 <label>Unit Size</label>
                 <select

@@ -148,6 +148,7 @@ function App() {
     let eiaValues = [];
     let preDecimalDigits;
     let postDecimalDigits;
+    let digitFormatting = "significantDigit";
 
     const formData = new FormData(formRef.current);
 
@@ -180,7 +181,8 @@ function App() {
           uniqueDelim,
           eiaValues,
           preDecimalDigits,
-          postDecimalDigits
+          postDecimalDigits,
+          digitFormatting
         );
         valObj[prevField].pop();
         descObj[prevField].pop();
@@ -200,6 +202,8 @@ function App() {
         preDecimalDigits = val[1];
       } else if (val[0].includes("postDecimalDigits")) {
         postDecimalDigits = val[1];
+      } else if (val[0].includes("digitFormatting")) {
+        digitFormatting = val[1];
       }
     }
     for (let params in valObj) {
@@ -308,7 +312,8 @@ function App() {
     delimiter,
     eiaValues,
     preDecimalDigits,
-    postDecimalDigits
+    postDecimalDigits,
+    digitFormatting
   ) {
     let arr = value.split("~");
     increment = parseFloat(increment);
@@ -329,43 +334,29 @@ function App() {
       let roundedValue = i.toFixed(6);
 
       if (eValueRange && eValueRange.includes(roundedValue)) {
-        roundedValue = formatNumbering(
+        const formattedNumber = formatNumbering(
           roundedValue,
           preDecimalDigits,
-          postDecimalDigits
+          postDecimalDigits,
+          digitFormatting,
+          delimiter
         );
 
-        if (!roundedValue.includes(".")) {
-          roundedValue += ".";
-        }
+        // console.log(formattedNumber);
 
-        let delimitedRoundedValue;
-        if (delimiter) {
-          delimitedRoundedValue = roundedValue.split(".").join(delimiter);
-        } else {
-          delimitedRoundedValue = roundedValue;
-        }
-        valArr.push(`${delimitedRoundedValue}${unit}`);
-        descArr.push(`${roundedValue} ${descSuffix}`);
+        valArr.push(`${formattedNumber.pnValue}${unit}`);
+        descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
       } else if (eValueRange == undefined) {
-        roundedValue = formatNumbering(
+        const formattedNumber = formatNumbering(
           roundedValue,
           preDecimalDigits,
-          postDecimalDigits
+          postDecimalDigits,
+          digitFormatting,
+          delimiter
         );
 
-        if (!roundedValue.includes(".")) {
-          roundedValue += ".";
-        }
-
-        let delimitedRoundedValue;
-        if (delimiter) {
-          delimitedRoundedValue = roundedValue.split(".").join(delimiter);
-        } else {
-          delimitedRoundedValue = roundedValue;
-        }
-        valArr.push(`${delimitedRoundedValue}${unit}`);
-        descArr.push(`${roundedValue} ${descSuffix}`);
+        valArr.push(`${formattedNumber.pnValue}${unit}`);
+        descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
       }
     }
     return [valArr, descArr];
@@ -410,24 +401,71 @@ function App() {
   }
 
   // Take an number and return one formatted based on the amount of digits pre and post decimal place
-  function formatNumbering(roundedValue, preDecimalDigits, postDecimalDigits) {
-    let precedingZeroes = "";
-    const preChars = roundedValue.split(".")[0].length;
-    const lastZero = roundedValue.split(".")[1].indexOf("0");
+  // Or formats to 3 significant digits with 1 metadata character
+  function formatNumbering(
+    roundedValue,
+    preDecimalDigits,
+    postDecimalDigits,
+    digitFormatting,
+    delimiter
+  ) {
+    let returnValue;
 
-    for (let i = preChars; i < preDecimalDigits; i++) {
-      precedingZeroes += "0";
-    }
+    if (digitFormatting == "significantDigit") {
+      const postDecimalDigits = roundedValue.split(".")[1].split("");
+      const preDecimalDigits = roundedValue.split(".")[0].split("");
+      let postDecimalNonZeroes = 0;
+      postDecimalDigits.map((digit) => {
+        if (digit !== "0") {
+          postDecimalNonZeroes++;
+        }
+      });
 
-    if (lastZero <= postDecimalDigits) {
-      roundedValue =
-        precedingZeroes + parseFloat(roundedValue).toFixed(postDecimalDigits);
+      // if its less than 3 digits, we still add the delimiter (10 = 10R0)
+      // if there's significant digits within the decimal point then it needs delimiter
+      if (postDecimalNonZeroes > 0 || preDecimalDigits.length < 3) {
+        if (roundedValue.startsWith("0", 0)) {
+          roundedValue = roundedValue.slice(1, roundedValue.length);
+        }
+
+        if (!roundedValue.includes(".")) {
+          returnValue = roundedValue + ".";
+        } else {
+          returnValue = roundedValue;
+        }
+      } else if (postDecimalNonZeroes === 0 && preDecimalDigits.length > 2) {
+        let preDecimalZeroes = 0;
+        preDecimalDigits.map((digit) => {
+          if (digit === "0") {
+            preDecimalZeroes++;
+          }
+        });
+        let fourthDigit = roundedValue.slice(3, preDecimalDigits.length).length;
+        returnValue = roundedValue.slice(0, 3).concat(fourthDigit);
+      }
     } else {
-      roundedValue =
-        precedingZeroes + roundedValue.slice(0, preChars + lastZero + 1);
+      let precedingZeroes = "";
+      const preChars = roundedValue.split(".")[0].length;
+      const lastZero = roundedValue.split(".")[1].indexOf("0");
+
+      for (let i = preChars; i < preDecimalDigits; i++) {
+        precedingZeroes += "0";
+      }
+
+      if (lastZero <= postDecimalDigits) {
+        returnValue =
+          precedingZeroes + parseFloat(roundedValue).toFixed(postDecimalDigits);
+      } else {
+        returnValue =
+          precedingZeroes + roundedValue.slice(0, preChars + lastZero + 1);
+      }
     }
 
-    return roundedValue;
+    if (delimiter) {
+      returnValue = returnValue.split(".").join(delimiter).slice(0, 4);
+    }
+
+    return { pnValue: returnValue, roundedValue: parseFloat(roundedValue) };
   }
 
   // the input, the current iteration, the working set, the working details, the object writing to, an array of delimiters to map
