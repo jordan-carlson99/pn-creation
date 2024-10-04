@@ -96,6 +96,16 @@ export function InputField(props) {
                     value="e6"
                     onChange={checkForRangeAndSetExample}
                   ></input>
+                  {/* <input
+                    type="text"
+                    name={`e6Field ${props.col}-${props.fieldName}`}
+                    placeholder="E6 Part Numbering Value"
+                  ></input>
+                  <input
+                    type="text"
+                    name={`e6Desc ${props.col}-${props.fieldName}`}
+                    placeholder="E6 Description"
+                  ></input> */}
                 </label>
                 <label htmlFor="eia-e12">
                   E12
@@ -106,6 +116,16 @@ export function InputField(props) {
                     value="e12"
                     onChange={checkForRangeAndSetExample}
                   ></input>
+                  {/* <input
+                    type="text"
+                    name={`e12Field ${props.col}-${props.fieldName}`}
+                    placeholder="E12 Part Numbering Value"
+                  ></input>
+                  <input
+                    type="text"
+                    name={`e12Desc ${props.col}-${props.fieldName}`}
+                    placeholder="E12 Description"
+                  ></input> */}
                 </label>
                 <label htmlFor="eia-e24">
                   E24
@@ -116,6 +136,16 @@ export function InputField(props) {
                     value="e24"
                     onChange={checkForRangeAndSetExample}
                   ></input>
+                  {/* <input
+                    type="text"
+                    name={`e24Field ${props.col}-${props.fieldName}`}
+                    placeholder="E24 Part Numbering Value"
+                  ></input>
+                  <input
+                    type="text"
+                    name={`e24Desc ${props.col}-${props.fieldName}`}
+                    placeholder="E24 Description"
+                  ></input> */}
                 </label>
 
                 <label htmlFor="eia-e48">
@@ -127,6 +157,16 @@ export function InputField(props) {
                     value="e48"
                     onChange={checkForRangeAndSetExample}
                   ></input>
+                  {/* <input
+                    type="text"
+                    name={`e48Field ${props.col}-${props.fieldName}`}
+                    placeholder="E48 Part Numbering Value"
+                  ></input>
+                  <input
+                    type="text"
+                    name={`e48Desc ${props.col}-${props.fieldName}`}
+                    placeholder="E48 Description"
+                  ></input> */}
                 </label>
                 <label htmlFor="eia-e96">
                   E96
@@ -137,6 +177,16 @@ export function InputField(props) {
                     value="e96"
                     onChange={checkForRangeAndSetExample}
                   ></input>
+                  {/* <input
+                    type="text"
+                    name={`e96Field ${props.col}-${props.fieldName}`}
+                    placeholder="E96 Part Numbering Value"
+                  ></input>
+                  <input
+                    type="text"
+                    name={`e96Desc ${props.col}-${props.fieldName}`}
+                    placeholder="E96 Description"
+                  ></input> */}
                 </label>
                 <label htmlFor="eia-e192">
                   E192
@@ -147,6 +197,16 @@ export function InputField(props) {
                     value="e192"
                     onChange={checkForRangeAndSetExample}
                   ></input>
+                  {/* <input
+                    type="text"
+                    name={`e192Field ${props.col}-${props.fieldName}`}
+                    placeholder="E192 Part Numbering Value"
+                  ></input>
+                  <input
+                    type="text"
+                    name={`e192Desc ${props.col}-${props.fieldName}`}
+                    placeholder="E192 Description"
+                  ></input> */}
                 </label>
               </div>
             )}
@@ -196,6 +256,8 @@ export function InputField(props) {
                   onChange={checkForRangeAndSetExample}
                   className="digit-select"
                 >
+                  <option>10000</option>
+                  <option>1000</option>
                   <option>100</option>
                   <option>10</option>
                   <option>5</option>

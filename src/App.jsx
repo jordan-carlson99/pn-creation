@@ -432,6 +432,12 @@ function App() {
         precedingZeroes += "0";
       }
 
+      if (!roundedValue.includes(".")) {
+        returnValue = roundedValue + ".";
+      } else {
+        returnValue = roundedValue;
+      }
+
       if (lastZero <= postDecimalDigits) {
         returnValue =
           precedingZeroes + parseFloat(roundedValue).toFixed(postDecimalDigits);
