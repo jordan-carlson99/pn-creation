@@ -43,235 +43,253 @@ function App() {
   const formRef = useRef(null);
 
   const addField = () => {
-    setFields([...fields, { "": "" }]);
+    try {
+      setFields([...fields, { "": "" }]);
+    } catch (error) {
+      console.error("Error adding field:", error);
+    }
   };
 
   const subField = () => {
-    if (fields.length > 0) {
-      setFields(fields.slice(0, fields.length - 1));
+    try {
+      if (fields.length > 0) {
+        setFields(fields.slice(0, fields.length - 1));
+      }
+    } catch (error) {
+      console.error("Error removing field:", error);
     }
   };
 
   const resetField = () => {
-    setFields([{ "": "" }]);
+    try {
+      setFields([{ "": "" }]);
+    } catch (error) {
+      console.error("Error resetting fields:", error);
+    }
   };
 
   const addTemplate = () => {
-    setFields([...fields, ...dKTemplateDefaults]);
+    try {
+      setFields([...fields, ...dKTemplateDefaults]);
+    } catch (error) {
+      console.error("Error adding template:", error);
+    }
   };
 
   const addMetadata = () => {
-    setFields([...fields, ...resistorDefaults]);
+    try {
+      setFields([...fields, ...resistorDefaults]);
+    } catch (error) {
+      console.error("Error adding metadata:", error);
+    }
   };
 
   function run() {
-    let formData = getFormData(formRef);
-    if (!formData) {
+    try {
+      let formData = getFormData(formRef);
+      if (!formData) {
+        return [false, false, false];
+      }
+
+      let keys = formData[1];
+      let combos = [];
+      generateCombinations(
+        formData[0],
+        keys,
+        0,
+        [],
+        {},
+        combos,
+        formData[2],
+        formData[3]
+      );
+      setExampleText(Object.keys(combos[0])[0]);
+      let csv = convertToCSV(combos);
+      const blob = new Blob([csv], { type: "application/octet-stream" });
+      const url = URL.createObjectURL(blob);
+      setBlobLink(url);
+      return combos;
+    } catch (error) {
+      console.error("Error in run function:", error);
       return [false, false, false];
     }
-
-    let keys = formData[1];
-    let combos = [];
-    generateCombinations(
-      // field values
-      formData[0],
-      keys,
-      0,
-      [],
-      {},
-      combos,
-      formData[2],
-      formData[3]
-    );
-    setExampleText(Object.keys(combos[0])[0]);
-    let csv = convertToCSV(combos);
-    const blob = new Blob([csv], { type: "application/octet-stream" });
-    const url = URL.createObjectURL(blob);
-    setBlobLink(url);
-    return combos;
   }
 
   function getFormData(formRef) {
-    let valObj = {};
-    let descObj = {};
-    let obj = {};
-    let keys = [];
-    let delimArr = [];
-    let prevVal;
-    let prevDesc;
-    let prevField;
-    let uniqueDelim = "";
-    let eiaValues = [];
-    let preDecimalDigits;
-    let postDecimalDigits;
-    let digitFormatting = "significantDigit";
+    try {
+      let valObj = {};
+      let descObj = {};
+      let obj = {};
+      let keys = [];
+      let delimArr = [];
+      let prevVal;
+      let prevDesc;
+      let prevField;
+      let uniqueDelim = "";
+      let eiaValues = [];
+      let preDecimalDigits;
+      let postDecimalDigits;
+      let digitFormatting = "significantDigit";
 
-    const formData = new FormData(formRef.current);
+      const formData = new FormData(formRef.current);
 
-    // ! This should not be iterated like this. It means unit has to come last for ranges
-    for (const val of formData.entries()) {
-      if (val[0].includes("notAllowed")) {
-        continue;
+      for (const val of formData.entries()) {
+        if (val[0].includes("notAllowed")) {
+          continue;
+        }
+        if (val[0].slice(0, 8).includes("fieldVal")) {
+          if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
+            valObj[val[0].split("fieldVal ")[1]].push(val[1]);
+          } else {
+            valObj[val[0].split("fieldVal ")[1]] = [val[1]];
+          }
+          prevVal = val[1];
+          prevField =
+            val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
+        } else if (val[0].slice(0, 8).includes("descVal")) {
+          if (descObj[val[0].split("descVal ")[1]] != undefined) {
+            descObj[val[0].split("descVal ")[1]].push(val[1]);
+          } else {
+            descObj[val[0].split("descVal ")[1]] = [val[1]];
+          }
+          prevDesc = val[1];
+          prevField =
+            val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
+        } else if (val[0].includes("delimiter")) {
+          delimArr.push(val[1]);
+          prevField =
+            val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
+        } else if (val[0].includes("unit")) {
+          let ranges = createRange(
+            val[1],
+            prevVal,
+            prevDesc,
+            uniqueDelim,
+            eiaValues,
+            preDecimalDigits,
+            postDecimalDigits,
+            digitFormatting
+          );
+          valObj[prevField].pop();
+          descObj[prevField].pop();
+          ranges[0].forEach((range, i) => {
+            let value = range;
+            let desc = ranges[1][i];
+            valObj[prevField].push(value);
+            descObj[prevField].push(desc);
+          });
+        } else if (val[0].includes("rangeDelim")) {
+          if (val[1] != "") {
+            uniqueDelim = val[1];
+          }
+        } else if (val[0].includes("eiaValue")) {
+          eiaValues.push(val[1]);
+        } else if (val[0].includes("preDecimalDigits")) {
+          preDecimalDigits = val[1];
+        } else if (val[0].includes("postDecimalDigits")) {
+          postDecimalDigits = val[1];
+        } else if (val[0].includes("digitFormatting")) {
+          digitFormatting = val[1];
+        }
       }
-      if (val[0].slice(0, 8).includes("fieldVal")) {
-        if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
-          valObj[val[0].split("fieldVal ")[1]].push(val[1]);
-        } else {
-          valObj[val[0].split("fieldVal ")[1]] = [val[1]];
-        }
-        prevVal = val[1];
-        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].slice(0, 8).includes("descVal")) {
-        if (descObj[val[0].split("descVal ")[1]] != undefined) {
-          descObj[val[0].split("descVal ")[1]].push(val[1]);
-        } else {
-          descObj[val[0].split("descVal ")[1]] = [val[1]];
-        }
-        prevDesc = val[1];
-        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].includes("delimiter")) {
-        delimArr.push(val[1]);
-        prevField = val[0].split("fieldVal ")[1] || val[0].split("descVal ")[1];
-      } else if (val[0].includes("unit")) {
-        let ranges = createRange(
-          val[1],
-          prevVal,
-          prevDesc,
-          uniqueDelim,
-          eiaValues,
-          preDecimalDigits,
-          postDecimalDigits,
-          digitFormatting
-        );
-        valObj[prevField].pop();
-        descObj[prevField].pop();
-        ranges[0].forEach((range, i) => {
-          let value = range;
-          let desc = ranges[1][i];
-          valObj[prevField].push(value);
-          descObj[prevField].push(desc);
+      for (let params in valObj) {
+        keys.push(params);
+        let arr = [];
+        valObj[params].forEach((elem, i) => {
+          arr.push({ [elem]: descObj[params][i] });
         });
-      } else if (val[0].includes("rangeDelim")) {
-        if (val[1] != "") {
-          uniqueDelim = val[1];
-        }
-      } else if (val[0].includes("eiaValue")) {
-        eiaValues.push(val[1]);
-      } else if (val[0].includes("preDecimalDigits")) {
-        preDecimalDigits = val[1];
-      } else if (val[0].includes("postDecimalDigits")) {
-        postDecimalDigits = val[1];
-      } else if (val[0].includes("digitFormatting")) {
-        digitFormatting = val[1];
+        obj[params] = arr;
       }
+      return [obj, keys, delimArr];
+    } catch (error) {
+      console.error("Error getting form data:", error);
+      return null;
     }
-    for (let params in valObj) {
-      keys.push(params);
-      let arr = [];
-      // console.log(params, valObj, valObj[params]);
-      valObj[params].forEach((elem, i) => {
-        arr.push({ [elem]: descObj[params][i] });
-      });
-      obj[params] = arr;
-    }
-    return [obj, keys, delimArr];
   }
 
   function generateCombinations(
-    obj, // The input object containing key-value pairs (each value is an array of objects)
-    keys, // The array of keys to iterate over
-    index, // The current index in the keys array (to control recursion)
-    currentPN, // The current part number (array form) being built as we go through the keys
-    currentDetails, // The current details object to store values associated with the current key
-    returnArray, // The object that will contain all the generated combinations
-    delimiters // Array of delimiters to be added between part numbers if needed
+    obj,
+    keys,
+    index,
+    currentPN,
+    currentDetails,
+    returnArray,
+    delimiters
   ) {
-    if (index == keys.length) {
-      // Base case: If we've gone through all the keys
-
-      // Loop through the delimiters to append them to the part number (PN) string
-      delimiters.forEach((d, i) => {
-        if (currentPN[i] === undefined) {
-          currentPN[i] = "";
-        }
-        // console.log(currentPN);
-        console.log(delimiters);
-
-        if (d != "(none)") {
-          console.log(currentPN[i]);
-
-          // If the delimiter is not "(none)", we add it to the part number
-
-          // Ensure the delimiter is not already at the end of the current part number
-          if (
-            currentPN[i] == "" ||
-            !currentPN[i]
-              ?.slice(currentPN[i].length - 1, currentPN[i].length)
-              ?.includes(d)
-          ) {
-            currentPN[i] = currentPN[i] + d; // Append the delimiter to the part number
+    try {
+      if (index == keys.length) {
+        delimiters.forEach((d, i) => {
+          if (currentPN[i] === undefined) {
+            currentPN[i] = "";
           }
+
+          if (d != "(none)") {
+            if (
+              currentPN[i] == "" ||
+              !currentPN[i]
+                ?.slice(currentPN[i].length - 1, currentPN[i].length)
+                ?.includes(d)
+            ) {
+              currentPN[i] = currentPN[i] + d;
+            }
+          }
+        });
+        returnArray.push({
+          [currentPN.join("")]: Object.assign({}, currentDetails),
+        });
+      } else {
+        const currentKey = keys[index];
+        const innerArray = obj[currentKey];
+
+        for (const innerObj of innerArray) {
+          const innerKey = Object.keys(innerObj)[0];
+          const innerVal = Object.values(innerObj)[0];
+
+          currentPN.push(innerKey);
+          const updatedDetails = Object.assign({}, currentDetails);
+          updatedDetails[currentKey] = innerVal;
+
+          generateCombinations(
+            obj,
+            keys,
+            index + 1,
+            currentPN,
+            updatedDetails,
+            returnArray,
+            delimiters
+          );
+
+          currentPN.pop();
+          delete currentDetails[currentKey];
         }
-      });
-      // console.log(currentPN, currentPN.join(""));
-
-      // Store the current part number and its corresponding details in the return object
-      returnArray.push({
-        [currentPN.join("")]: Object.assign({}, currentDetails),
-      }); // Combine part number into a string and copy current details then push that into return array
-      // console.log(returnObject);
-    } else {
-      // Recursive case: If we haven't gone through all the keys yet
-
-      const currentKey = keys[index]; // Get the current key to work with
-      const innerArray = obj[currentKey]; // Get the array of objects associated with the current key
-
-      // Loop through each object in the inner array
-      for (const innerObj of innerArray) {
-        const innerKey = Object.keys(innerObj)[0]; // Get the key of the current object in the array
-        const innerVal = Object.values(innerObj)[0]; // Get the value of the current object
-
-        currentPN.push(innerKey); // Add the current key to the part number array
-
-        const updatedDetails = Object.assign({}, currentDetails); // Create a new copy of the current details object
-        updatedDetails[currentKey] = innerVal; // Add the value of the current key to the details
-
-        // Recursively call the function to go deeper into the next key
-        generateCombinations(
-          obj,
-          keys,
-          index + 1, // Move to the next key
-          currentPN,
-          updatedDetails,
-          returnArray,
-          delimiters
-        );
-
-        // Backtrack: remove the last added part number and detail to explore other combinations
-        currentPN.pop(); // Remove the last part of the part number
-        delete currentDetails[currentKey]; // Remove the last key from the details
       }
+    } catch (error) {
+      console.error("Error generating combinations:", error);
     }
   }
 
   function convertToCSV(inputArray) {
-    let header;
-    let rows = [];
-    // Adding this tells excel its encoded in utf8 (removes weird character artefacts)
-    const BOM = "\uFEFF";
-    inputArray.forEach((inputObject) => {
-      for (let pn in inputObject) {
-        header = "PN," + Object.keys(inputObject[pn]).join(",");
-      }
-      const row = Object.entries(inputObject).map(([key, value]) => {
-        const values = Object.values(value)
-          .map((val) => `"${val}"`)
-          .join(",");
-        return `"${key}",${values}`;
+    try {
+      let header;
+      let rows = [];
+      const BOM = "\uFEFF";
+      inputArray.forEach((inputObject) => {
+        for (let pn in inputObject) {
+          header = "PN," + Object.keys(inputObject[pn]).join(",");
+        }
+        const row = Object.entries(inputObject).map(([key, value]) => {
+          const values = Object.values(value)
+            .map((val) => `"${val}"`)
+            .join(",");
+          return `"${key}",${values}`;
+        });
+        rows.push(row);
       });
-      rows.push(row);
-    });
-    return `${BOM}${header}\n${rows.join("\n")}`;
+      return `${BOM}${header}\n${rows.join("\n")}`;
+    } catch (error) {
+      console.error("Error converting to CSV:", error);
+      return "";
+    }
   }
 
   function createRange(
@@ -284,82 +302,86 @@ function App() {
     postDecimalDigits,
     digitFormatting
   ) {
-    let arr = value.split("~");
-    increment = parseFloat(increment);
-    let start = parseFloat(arr[0]);
-    let end = parseFloat(arr[1]);
-    let unit = arr[1].split(end)[1];
-    let descSuffix = description.split(end)[1] || description;
-    let valArr = [];
-    let descArr = [];
-    let eValueRange;
+    try {
+      let arr = value.split("~");
+      increment = parseFloat(increment);
+      let start = parseFloat(arr[0]);
+      let end = parseFloat(arr[1]);
+      let unit = arr[1].split(end)[1];
+      let descSuffix = description.split(end)[1] || description;
+      let valArr = [];
+      let descArr = [];
+      let eValueRange = eiaValueRange(
+        eiaValues,
+        preDecimalDigits,
+        postDecimalDigits
+      );
 
-    // Return all possible values based on the eia values selected if eia validation selected
-    eValueRange = eiaValueRange(eiaValues, preDecimalDigits, postDecimalDigits);
-    // start + 1 since we already put the previous value on here in getFormData
-    for (let i = start; i <= end; i += increment) {
-      // ! If you change this, change the toFixed value in in eiaValueRange aswell
-      let roundedValue = i.toFixed(6);
+      for (let i = start; i <= end; i += increment) {
+        let roundedValue = i.toFixed(6);
 
-      if (eValueRange && eValueRange.includes(roundedValue)) {
-        const formattedNumber = formatNumbering(
-          roundedValue,
-          preDecimalDigits,
-          postDecimalDigits,
-          digitFormatting,
-          delimiter
-        );
-
-        // console.log(formattedNumber);
-
-        valArr.push(`${formattedNumber.pnValue}${unit}`);
-        descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
-      } else if (eValueRange == undefined) {
-        const formattedNumber = formatNumbering(
-          roundedValue,
-          preDecimalDigits,
-          postDecimalDigits,
-          digitFormatting,
-          delimiter
-        );
-
-        valArr.push(`${formattedNumber.pnValue}${unit}`);
-        descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+        if (eValueRange && eValueRange.includes(roundedValue)) {
+          const formattedNumber = formatNumbering(
+            roundedValue,
+            preDecimalDigits,
+            postDecimalDigits,
+            digitFormatting,
+            delimiter
+          );
+          valArr.push(`${formattedNumber.pnValue}${unit}`);
+          descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+        } else if (eValueRange == undefined) {
+          const formattedNumber = formatNumbering(
+            roundedValue,
+            preDecimalDigits,
+            postDecimalDigits,
+            digitFormatting,
+            delimiter
+          );
+          valArr.push(`${formattedNumber.pnValue}${unit}`);
+          descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+        }
       }
+      return [valArr, descArr];
+    } catch (error) {
+      console.error("Error creating range:", error);
+      return [[], []];
     }
-    return [valArr, descArr];
   }
 
   function eiaValueRange(eiaValues) {
-    let values = [];
-    if (eiaValues.includes("e6")) {
-      values.push(...e6);
-    }
-    if (eiaValues.includes("e12")) {
-      values.push(...e12);
-    }
-    if (eiaValues.includes("e24")) {
-      values.push(...e24);
-    }
-    if (eiaValues.includes("e48")) {
-      values.push(...e48);
-    }
-    if (eiaValues.includes("e96")) {
-      values.push(...e96);
-    }
-    if (eiaValues.includes("e192")) {
-      values.push(...e192);
-    }
+    try {
+      let values = [];
+      if (eiaValues.includes("e6")) {
+        values.push(...e6);
+      }
+      if (eiaValues.includes("e12")) {
+        values.push(...e12);
+      }
+      if (eiaValues.includes("e24")) {
+        values.push(...e24);
+      }
+      if (eiaValues.includes("e48")) {
+        values.push(...e48);
+      }
+      if (eiaValues.includes("e96")) {
+        values.push(...e96);
+      }
+      if (eiaValues.includes("e192")) {
+        values.push(...e192);
+      }
 
-    if (values.length < 1) {
-      return;
-    }
+      if (values.length < 1) {
+        return;
+      }
 
-    return values;
+      return values;
+    } catch (error) {
+      console.error("Error getting EIA value range:", error);
+      return [];
+    }
   }
 
-  // Take an number and return one formatted based on the amount of digits pre and post decimal place
-  // Or formats to 3 significant digits with 1 metadata character
   function formatNumbering(
     roundedValue,
     preDecimalDigits,
@@ -367,59 +389,52 @@ function App() {
     digitFormatting,
     delimiter
   ) {
-    let returnValue;
+    try {
+      let returnValue;
 
-    // Parse the roundedValue as a float first
-    roundedValue = parseFloat(roundedValue).toString();
+      roundedValue = parseFloat(roundedValue).toString();
 
-    if (digitFormatting == "significantDigit") {
-      let [preDecimalPart, postDecimalPart] = roundedValue.split(".");
+      if (digitFormatting == "significantDigit") {
+        let [preDecimalPart, postDecimalPart] = roundedValue.split(".");
 
-      // Ensure both parts exist
-      preDecimalPart = preDecimalPart || "0";
-      postDecimalPart = postDecimalPart || "";
+        preDecimalPart = preDecimalPart || "0";
+        postDecimalPart = postDecimalPart || "";
 
-      // Limit pre-decimal digits to the specified amount of significant digits
-      preDecimalPart = preDecimalPart.slice(0, preDecimalDigits);
+        preDecimalPart = preDecimalPart.slice(0, preDecimalDigits);
 
-      // Count non-zero significant digits after decimal
-      let postDecimalSignificant = "";
-      let count = 0;
-      for (let i = 0; i < postDecimalPart.length; i++) {
-        if (postDecimalPart[i] !== "0") {
-          count++;
+        let postDecimalSignificant = "";
+        let count = 0;
+        for (let i = 0; i < postDecimalPart.length; i++) {
+          if (postDecimalPart[i] !== "0") {
+            count++;
+          }
+          postDecimalSignificant += postDecimalPart[i];
+          if (count >= postDecimalDigits) {
+            break;
+          }
         }
-        postDecimalSignificant += postDecimalPart[i];
-        if (count >= postDecimalDigits) {
-          break;
-        }
+
+        returnValue =
+          preDecimalPart +
+          (postDecimalSignificant ? "." + postDecimalSignificant : "");
+      } else {
+        returnValue = parseFloat(roundedValue).toFixed(postDecimalDigits);
       }
 
-      // Combine the pre and post decimal parts
-      returnValue =
-        preDecimalPart +
-        (postDecimalSignificant ? "." + postDecimalSignificant : "");
-    } else {
-      // Standard rounding to the postDecimalDigits provided
-      returnValue = parseFloat(roundedValue).toFixed(postDecimalDigits);
-    }
+      if (delimiter) {
+        if (returnValue.startsWith("0.")) {
+          returnValue = "." + returnValue.split(".")[1];
+        }
 
-    // Replace decimal point with delimiter if provided
-    if (delimiter) {
-      // Remove leading zero from the pre-decimal part for delimited values
-
-      if (returnValue.startsWith("0.")) {
-        returnValue = returnValue = "." + returnValue.split(".")[1];
+        returnValue = returnValue.split(".").join(delimiter);
       }
 
-      returnValue = returnValue.split(".").join(delimiter);
+      return { pnValue: returnValue, roundedValue: parseFloat(roundedValue) };
+    } catch (error) {
+      console.error("Error formatting numbering:", error);
+      return { pnValue: "", roundedValue: 0 };
     }
-
-    // Return both the formatted pnValue and the original rounded float value
-    return { pnValue: returnValue, roundedValue: parseFloat(roundedValue) };
   }
-
-  // the input, the current iteration, the working set, the working details, the object writing to, an array of delimiters to map
 
   const fieldElements = [];
   fields.forEach((field, i) => {
@@ -440,9 +455,13 @@ function App() {
   });
 
   useEffect(() => {
-    let data = run();
-    if (data[0]) {
-      setExampleText(Object.keys(data[0])[0]);
+    try {
+      let data = run();
+      if (data[0]) {
+        setExampleText(Object.keys(data[0])[0]);
+      }
+    } catch (error) {
+      console.error("Error in useEffect:", error);
     }
   }, [example]);
 

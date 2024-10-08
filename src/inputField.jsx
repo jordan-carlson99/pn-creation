@@ -7,47 +7,71 @@ export function InputField(props) {
     useState("significantDigit");
   const [desc, setDesc] = useState("");
 
-  // This is pre-pended to the input names, if it's empty, the names will be pulled, it it's not, they wont be
+  // This is pre-pended to the input names; if it's empty, the names will be pulled; if it's not, they won't be
   const [allow, setAllow] = useState("notAllowed");
 
   const checkForRangeAndSetExample = (e) => {
-    props.setExample(e.target.value);
-    if (e.target.name.includes("fieldVal")) {
-      if (e.target.value.includes("~")) {
-        setIsRange(true);
-      } else {
-        if (isRange == true) {
-          setIsRange(false);
+    try {
+      props.setExample(e.target.value);
+      if (e.target.name.includes("fieldVal")) {
+        if (e.target.value.includes("~")) {
+          setIsRange(true);
+        } else {
+          if (isRange) {
+            setIsRange(false);
+          }
         }
       }
+    } catch (error) {
+      console.error("Error in checkForRangeAndSetExample:", error);
     }
   };
 
   const handleValidation = (e) => {
-    setValidation(e.target.value);
+    try {
+      setValidation(e.target.value);
+    } catch (error) {
+      console.error("Error in handleValidation:", error);
+    }
   };
 
   const handleDigitFormatting = (e) => {
-    setSignificantDigitValidation(e.target.value);
+    try {
+      setSignificantDigitValidation(e.target.value);
+    } catch (error) {
+      console.error("Error in handleDigitFormatting:", error);
+    }
   };
 
   const changeDesc = (e) => {
-    setDesc(e.target.value);
+    try {
+      setDesc(e.target.value);
+    } catch (error) {
+      console.error("Error in changeDesc:", error);
+    }
   };
 
   const handleAllow = (e) => {
-    if (!e.target.checked) {
-      setAllow("notAllowed");
-      props.setParentAllow("notAllowed");
-    } else {
-      setAllow("");
-      props.setParentAllow("");
+    try {
+      if (!e.target.checked) {
+        setAllow("notAllowed");
+        props.setParentAllow("notAllowed");
+      } else {
+        setAllow("");
+        props.setParentAllow("");
+      }
+    } catch (error) {
+      console.error("Error in handleAllow:", error);
     }
   };
 
   useEffect(() => {
-    if (props.defaultDesc) {
-      setDesc(props.defaultDesc);
+    try {
+      if (props.defaultDesc) {
+        setDesc(props.defaultDesc);
+      }
+    } catch (error) {
+      console.error("Error in useEffect:", error);
     }
   }, [props.defaultDesc]);
 
@@ -93,7 +117,6 @@ export function InputField(props) {
               <option value="EIA">EIA Validation</option>
               <option value="">No validation</option>
             </select>
-            {/* <label>Digit Formatting</label> */}
             <select
               onChange={handleDigitFormatting}
               name={`${allow}digitFormatting`}
@@ -105,7 +128,7 @@ export function InputField(props) {
             </select>
           </div>
           <div className="options-container">
-            {validation == "EIA" && (
+            {validation === "EIA" && (
               <div className="eia-container">
                 <label htmlFor="eia-e6">
                   E6
@@ -115,16 +138,6 @@ export function InputField(props) {
                     value="e6"
                     onChange={checkForRangeAndSetExample}
                   ></input>
-                  {/* <input
-                    type="text"
-                    name={`e6Field ${props.col}-${props.fieldName}`}
-                    placeholder="E6 Part Numbering Value"
-                  ></input>
-                  <input
-                    type="text"
-                    name={`e6Desc ${props.col}-${props.fieldName}`}
-                    placeholder="E6 Description"
-                  ></input> */}
                 </label>
                 <label htmlFor="eia-e12">
                   E12
@@ -135,16 +148,6 @@ export function InputField(props) {
                     value="e12"
                     onChange={checkForRangeAndSetExample}
                   ></input>
-                  {/* <input
-                    type="text"
-                    name={`e12Field ${props.col}-${props.fieldName}`}
-                    placeholder="E12 Part Numbering Value"
-                  ></input>
-                  <input
-                    type="text"
-                    name={`e12Desc ${props.col}-${props.fieldName}`}
-                    placeholder="E12 Description"
-                  ></input> */}
                 </label>
                 <label htmlFor="eia-e24">
                   E24
@@ -155,18 +158,7 @@ export function InputField(props) {
                     value="e24"
                     onChange={checkForRangeAndSetExample}
                   ></input>
-                  {/* <input
-                    type="text"
-                    name={`e24Field ${props.col}-${props.fieldName}`}
-                    placeholder="E24 Part Numbering Value"
-                  ></input>
-                  <input
-                    type="text"
-                    name={`e24Desc ${props.col}-${props.fieldName}`}
-                    placeholder="E24 Description"
-                  ></input> */}
                 </label>
-
                 <label htmlFor="eia-e48">
                   E48
                   <input
@@ -176,16 +168,6 @@ export function InputField(props) {
                     value="e48"
                     onChange={checkForRangeAndSetExample}
                   ></input>
-                  {/* <input
-                    type="text"
-                    name={`e48Field ${props.col}-${props.fieldName}`}
-                    placeholder="E48 Part Numbering Value"
-                  ></input>
-                  <input
-                    type="text"
-                    name={`e48Desc ${props.col}-${props.fieldName}`}
-                    placeholder="E48 Description"
-                  ></input> */}
                 </label>
                 <label htmlFor="eia-e96">
                   E96
@@ -196,16 +178,6 @@ export function InputField(props) {
                     value="e96"
                     onChange={checkForRangeAndSetExample}
                   ></input>
-                  {/* <input
-                    type="text"
-                    name={`e96Field ${props.col}-${props.fieldName}`}
-                    placeholder="E96 Part Numbering Value"
-                  ></input>
-                  <input
-                    type="text"
-                    name={`e96Desc ${props.col}-${props.fieldName}`}
-                    placeholder="E96 Description"
-                  ></input> */}
                 </label>
                 <label htmlFor="eia-e192">
                   E192
@@ -216,16 +188,6 @@ export function InputField(props) {
                     value="e192"
                     onChange={checkForRangeAndSetExample}
                   ></input>
-                  {/* <input
-                    type="text"
-                    name={`e192Field ${props.col}-${props.fieldName}`}
-                    placeholder="E192 Part Numbering Value"
-                  ></input>
-                  <input
-                    type="text"
-                    name={`e192Desc ${props.col}-${props.fieldName}`}
-                    placeholder="E192 Description"
-                  ></input> */}
                 </label>
               </div>
             )}

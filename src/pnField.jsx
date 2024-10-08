@@ -8,20 +8,39 @@ export function PNField(props) {
 
   // props.field given to field name on mount
   useEffect(() => {
-    if (props.field) {
-      setFieldName(props.field);
+    try {
+      if (props.field) {
+        setFieldName(props.field);
+      }
+    } catch (error) {
+      console.error("Error in useEffect:", error);
     }
   }, [props.field]);
 
   const addRow = () => {
-    setRows(rows + 1);
+    try {
+      setRows(rows + 1);
+    } catch (error) {
+      console.error("Error in addRow:", error);
+    }
   };
+
   const subRow = () => {
-    setRows(rows - 1);
+    try {
+      if (rows > 1) {
+        setRows(rows - 1);
+      }
+    } catch (error) {
+      console.error("Error in subRow:", error);
+    }
   };
 
   const changeName = (e) => {
-    setFieldName(e.target.value);
+    try {
+      setFieldName(e.target.value);
+    } catch (error) {
+      console.error("Error in changeName:", error);
+    }
   };
 
   let rowElems = [];
