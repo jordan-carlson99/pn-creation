@@ -22,6 +22,18 @@ const resistorDefaults = [
   { "Cage Code": "07WP9" },
 ];
 
+const dKTemplateDefaults = [
+  { "Power Code (If not in PN)": "" },
+  { "Operating Temp Range": "" },
+  { "Package / Case": "" },
+  { "Supplier Device Package": "" },
+  { "Size / Dimensions": "" },
+  { "Number of Terminations": "" },
+  { "Other Part Number": "" },
+  { MOQ: "" },
+  { "Order Multiple": "" },
+];
+
 function App() {
   const [fields, setFields] = useState([{ "": "" }]);
   const [blobLink, setBlobLink] = useState("/");
@@ -45,7 +57,7 @@ function App() {
   };
 
   const addTemplate = () => {
-    // setFields(defaultTemplate);
+    setFields([...fields, ...dKTemplateDefaults]);
   };
 
   const addMetadata = () => {
@@ -54,6 +66,9 @@ function App() {
 
   function run() {
     let formData = getFormData(formRef);
+    if (!formData) {
+      return [false, false, false];
+    }
 
     let keys = formData[1];
     let combos = [];
@@ -68,6 +83,7 @@ function App() {
       formData[2],
       formData[3]
     );
+    setExampleText(Object.keys(combos[0])[0]);
     let csv = convertToCSV(combos);
     const blob = new Blob([csv], { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
@@ -94,6 +110,9 @@ function App() {
 
     // ! This should not be iterated like this. It means unit has to come last for ranges
     for (const val of formData.entries()) {
+      if (val[0].includes("notAllowed")) {
+        continue;
+      }
       if (val[0].slice(0, 8).includes("fieldVal")) {
         if (valObj[val[0].split("fieldVal ")[1]] != undefined) {
           valObj[val[0].split("fieldVal ")[1]].push(val[1]);
@@ -149,6 +168,7 @@ function App() {
     for (let params in valObj) {
       keys.push(params);
       let arr = [];
+      // console.log(params, valObj, valObj[params]);
       valObj[params].forEach((elem, i) => {
         arr.push({ [elem]: descObj[params][i] });
       });
@@ -171,14 +191,23 @@ function App() {
 
       // Loop through the delimiters to append them to the part number (PN) string
       delimiters.forEach((d, i) => {
+        if (currentPN[i] === undefined) {
+          currentPN[i] = "";
+        }
+        // console.log(currentPN);
+        console.log(delimiters);
+
         if (d != "(none)") {
+          console.log(currentPN[i]);
+
           // If the delimiter is not "(none)", we add it to the part number
 
           // Ensure the delimiter is not already at the end of the current part number
           if (
+            currentPN[i] == "" ||
             !currentPN[i]
-              .slice(currentPN[i].length - 1, currentPN[i].length)
-              .includes(d)
+              ?.slice(currentPN[i].length - 1, currentPN[i].length)
+              ?.includes(d)
           ) {
             currentPN[i] = currentPN[i] + d; // Append the delimiter to the part number
           }
@@ -340,66 +369,53 @@ function App() {
   ) {
     let returnValue;
 
+    // Parse the roundedValue as a float first
+    roundedValue = parseFloat(roundedValue).toString();
+
     if (digitFormatting == "significantDigit") {
-      const postDecimalDigits = roundedValue.split(".")[1].split("");
-      const preDecimalDigits = roundedValue.split(".")[0].split("");
-      let postDecimalNonZeroes = 0;
-      postDecimalDigits.map((digit) => {
-        if (digit !== "0") {
-          postDecimalNonZeroes++;
-        }
-      });
+      let [preDecimalPart, postDecimalPart] = roundedValue.split(".");
 
-      // if its less than 3 digits, we still add the delimiter (10 = 10R0)
-      // if there's significant digits within the decimal point then it needs delimiter
-      if (postDecimalNonZeroes > 0 || preDecimalDigits.length < 3) {
-        if (roundedValue.startsWith("0", 0)) {
-          roundedValue = roundedValue.slice(1, roundedValue.length);
-        }
+      // Ensure both parts exist
+      preDecimalPart = preDecimalPart || "0";
+      postDecimalPart = postDecimalPart || "";
 
-        if (!roundedValue.includes(".")) {
-          returnValue = roundedValue + ".";
-        } else {
-          returnValue = roundedValue;
+      // Limit pre-decimal digits to the specified amount of significant digits
+      preDecimalPart = preDecimalPart.slice(0, preDecimalDigits);
+
+      // Count non-zero significant digits after decimal
+      let postDecimalSignificant = "";
+      let count = 0;
+      for (let i = 0; i < postDecimalPart.length; i++) {
+        if (postDecimalPart[i] !== "0") {
+          count++;
         }
-      } else if (postDecimalNonZeroes === 0 && preDecimalDigits.length > 2) {
-        let preDecimalZeroes = 0;
-        preDecimalDigits.map((digit) => {
-          if (digit === "0") {
-            preDecimalZeroes++;
-          }
-        });
-        let fourthDigit = roundedValue.slice(3, preDecimalDigits.length).length;
-        returnValue = roundedValue.slice(0, 3).concat(fourthDigit);
+        postDecimalSignificant += postDecimalPart[i];
+        if (count >= postDecimalDigits) {
+          break;
+        }
       }
+
+      // Combine the pre and post decimal parts
+      returnValue =
+        preDecimalPart +
+        (postDecimalSignificant ? "." + postDecimalSignificant : "");
     } else {
-      let precedingZeroes = "";
-      const preChars = roundedValue.split(".")[0].length;
-      const lastZero = roundedValue.split(".")[1].indexOf("0");
-
-      for (let i = preChars; i < preDecimalDigits; i++) {
-        precedingZeroes += "0";
-      }
-
-      if (!roundedValue.includes(".")) {
-        returnValue = roundedValue + ".";
-      } else {
-        returnValue = roundedValue;
-      }
-
-      if (lastZero <= postDecimalDigits) {
-        returnValue =
-          precedingZeroes + parseFloat(roundedValue).toFixed(postDecimalDigits);
-      } else {
-        returnValue =
-          precedingZeroes + roundedValue.slice(0, preChars + lastZero + 1);
-      }
+      // Standard rounding to the postDecimalDigits provided
+      returnValue = parseFloat(roundedValue).toFixed(postDecimalDigits);
     }
 
+    // Replace decimal point with delimiter if provided
     if (delimiter) {
-      returnValue = returnValue.split(".").join(delimiter).slice(0, 4);
+      // Remove leading zero from the pre-decimal part for delimited values
+
+      if (returnValue.startsWith("0.")) {
+        returnValue = returnValue = "." + returnValue.split(".")[1];
+      }
+
+      returnValue = returnValue.split(".").join(delimiter);
     }
 
+    // Return both the formatted pnValue and the original rounded float value
     return { pnValue: returnValue, roundedValue: parseFloat(roundedValue) };
   }
 
@@ -457,14 +473,14 @@ function App() {
             className="template-input"
             onClick={addTemplate}
           >
-            Add Default
+            Add DK Template
           </button>
           <button
             type="button"
             className="template-addition"
             onClick={addMetadata}
           >
-            Add Metadata
+            Add Default Resistor Values
           </button>
         </div>
         <a href={blobLink} download={`pn_creation-${exampleText}.csv`}>

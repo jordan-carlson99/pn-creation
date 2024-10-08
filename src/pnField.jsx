@@ -4,6 +4,7 @@ import { InputField } from "./inputField";
 export function PNField(props) {
   const [rows, setRows] = useState(1);
   const [fieldName, setFieldName] = useState("");
+  const [parentAllow, setParentAllow] = useState("notAllowed");
 
   // props.field given to field name on mount
   useEffect(() => {
@@ -32,6 +33,7 @@ export function PNField(props) {
         setExample={props.setExample}
         defaultDesc={props.defaultDesc}
         key={`pnrow-${i}`}
+        setParentAllow={setParentAllow}
       />
     );
   }
@@ -56,7 +58,7 @@ export function PNField(props) {
       </div>
       {props.col !== props.total - 1 && (
         <div className="delimiter-container">
-          <select name="delimiter">
+          <select name={`${parentAllow}delimiter`}>
             <option>(none)</option>
             <option>-</option>
           </select>

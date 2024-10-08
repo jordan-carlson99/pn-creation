@@ -7,6 +7,9 @@ export function InputField(props) {
     useState("significantDigit");
   const [desc, setDesc] = useState("");
 
+  // This is pre-pended to the input names, if it's empty, the names will be pulled, it it's not, they wont be
+  const [allow, setAllow] = useState("notAllowed");
+
   const checkForRangeAndSetExample = (e) => {
     props.setExample(e.target.value);
     if (e.target.name.includes("fieldVal")) {
@@ -32,6 +35,16 @@ export function InputField(props) {
     setDesc(e.target.value);
   };
 
+  const handleAllow = (e) => {
+    if (!e.target.checked) {
+      setAllow("notAllowed");
+      props.setParentAllow("notAllowed");
+    } else {
+      setAllow("");
+      props.setParentAllow("");
+    }
+  };
+
   useEffect(() => {
     if (props.defaultDesc) {
       setDesc(props.defaultDesc);
@@ -42,13 +55,19 @@ export function InputField(props) {
     <div className="input-field">
       <div className="field-container">
         <input
-          name={`fieldVal ${props.col}-${props.fieldName}`}
+          type="checkbox"
+          name="isUse"
+          value={true}
+          onChange={handleAllow}
+        ></input>
+        <input
+          name={`${allow}fieldVal ${props.col}-${props.fieldName}`}
           type="text"
           placeholder="Part numbering value"
           onChange={checkForRangeAndSetExample}
         ></input>
         <input
-          name={`descVal ${props.col}-${props.fieldName}`}
+          name={`${allow}descVal ${props.col}-${props.fieldName}`}
           type="text"
           placeholder={isRange ? "Unit" : "Description"}
           value={desc}
@@ -62,11 +81,11 @@ export function InputField(props) {
             <input
               type="text"
               placeholder="Delimiter"
-              name="rangeDelim"
+              name={`${allow}rangeDelim`}
               className="delimiter-input"
             ></input>
             <select
-              name="validateEIA"
+              name={`${allow}validateEIA`}
               className="validation-dropdown"
               value={validation}
               onChange={handleValidation}
@@ -77,7 +96,7 @@ export function InputField(props) {
             {/* <label>Digit Formatting</label> */}
             <select
               onChange={handleDigitFormatting}
-              name="digitFormatting"
+              name={`${allow}digitFormatting`}
               className="digit-formatting-dropdown"
               value={significantDigitValidation}
             >
@@ -92,7 +111,7 @@ export function InputField(props) {
                   E6
                   <input
                     type="checkbox"
-                    name="eiaValue"
+                    name={`${allow}eiaValue`}
                     value="e6"
                     onChange={checkForRangeAndSetExample}
                   ></input>
@@ -111,7 +130,7 @@ export function InputField(props) {
                   E12
                   <input
                     type="checkbox"
-                    name="eiaValue"
+                    name={`${allow}eiaValue`}
                     id="eia-e12"
                     value="e12"
                     onChange={checkForRangeAndSetExample}
@@ -131,7 +150,7 @@ export function InputField(props) {
                   E24
                   <input
                     type="checkbox"
-                    name="eiaValue"
+                    name={`${allow}eiaValue`}
                     id="eia-e24"
                     value="e24"
                     onChange={checkForRangeAndSetExample}
@@ -152,7 +171,7 @@ export function InputField(props) {
                   E48
                   <input
                     type="checkbox"
-                    name="eiaValue"
+                    name={`${allow}eiaValue`}
                     id="eia-e48"
                     value="e48"
                     onChange={checkForRangeAndSetExample}
@@ -172,7 +191,7 @@ export function InputField(props) {
                   E96
                   <input
                     type="checkbox"
-                    name="eiaValue"
+                    name={`${allow}eiaValue`}
                     id="eia-e96"
                     value="e96"
                     onChange={checkForRangeAndSetExample}
@@ -192,7 +211,7 @@ export function InputField(props) {
                   E192
                   <input
                     type="checkbox"
-                    name="eiaValue"
+                    name={`${allow}eiaValue`}
                     id="eia-e192"
                     value="e192"
                     onChange={checkForRangeAndSetExample}
@@ -219,7 +238,7 @@ export function InputField(props) {
                   <div className="digit-select-container">
                     <label>Pre Decimal Digits</label>
                     <select
-                      name="preDecimalDigits"
+                      name={`${allow}preDecimalDigits`}
                       id="pre-decimal-digits"
                       onChange={checkForRangeAndSetExample}
                       className="digit-select"
@@ -234,7 +253,7 @@ export function InputField(props) {
                   <div className="digit-select-container">
                     <label>Post Decimal Digits</label>
                     <select
-                      name="postDecimalDigits"
+                      name={`${allow}postDecimalDigits`}
                       id="post-decimal-digits"
                       onChange={checkForRangeAndSetExample}
                       className="digit-select"
@@ -252,7 +271,7 @@ export function InputField(props) {
               <div className="digit-select-container">
                 <label>Unit Size</label>
                 <select
-                  name="unit"
+                  name={`${allow}unit`}
                   onChange={checkForRangeAndSetExample}
                   className="digit-select"
                 >
@@ -265,6 +284,7 @@ export function InputField(props) {
                   <option>0.1</option>
                   <option>0.01</option>
                   <option>0.001</option>
+                  <option>0.0001</option>
                 </select>
               </div>
             </div>
