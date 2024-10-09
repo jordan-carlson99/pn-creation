@@ -93,8 +93,6 @@ function App() {
 
       let keys = formData[1];
       let combos = [];
-      console.log(formData[2].length, formData[1].length);
-
       generateCombinations(formData[0], keys, 0, [], {}, combos, formData[2]);
       if (combos) {
         setExampleText(Object.keys(combos[0])[0]);
