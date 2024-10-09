@@ -57,9 +57,6 @@ export function PNField(props) {
 
   let rowElems = [];
   for (let i = 0; i < rows; i++) {
-    // console.log(activeArray[i]);
-    console.log(activeArray);
-
     activeArray[i] = activeArray[i] || false;
     rowElems.push(
       <InputField
