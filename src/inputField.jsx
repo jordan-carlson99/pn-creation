@@ -53,13 +53,17 @@ export function InputField(props) {
 
   const handleAllow = (e) => {
     try {
-      if (!e.target.checked) {
-        setAllow("notAllowed");
-        props.setParentAllow("notAllowed");
-      } else {
-        setAllow("");
-        props.setParentAllow("");
-      }
+      // Create a copy of the activeArray
+      const updatedArray = [...props.activeArray];
+
+      // Update the specific index based on the checkbox's checked status
+      updatedArray[props.parentIndex] = e.target.checked;
+
+      // Call handleParentAllow with the updated array to update the state in the parent component
+      props.handleParentAllow(updatedArray);
+
+      // Update the local state based on the checkbox state
+      setAllow(e.target.checked ? "" : "notAllowed");
     } catch (error) {
       console.error("Error in handleAllow:", error);
     }

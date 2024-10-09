@@ -93,16 +93,9 @@ function App() {
 
       let keys = formData[1];
       let combos = [];
-      generateCombinations(
-        formData[0],
-        keys,
-        0,
-        [],
-        {},
-        combos,
-        formData[2],
-        formData[3]
-      );
+      console.log(formData[2].length, formData[1].length);
+
+      generateCombinations(formData[0], keys, 0, [], {}, combos, formData[2]);
       if (combos) {
         setExampleText(Object.keys(combos[0])[0]);
         let csv = convertToCSV(combos);
@@ -221,12 +214,13 @@ function App() {
     try {
       if (index == keys.length) {
         delimiters.forEach((d, i) => {
-          if (currentPN[i] === undefined) {
+          if (currentPN[i] === undefined || currentPN[i] === "") {
             currentPN[i] = "";
           }
 
           if (d != "(none)") {
             if (
+              // If the pn value is null or if the pn doesnt already include the delimiter
               currentPN[i] == "" ||
               !currentPN[i]
                 ?.slice(currentPN[i].length - 1, currentPN[i].length)
@@ -480,7 +474,6 @@ function App() {
             .slice(0, preDecimalDigits + postDecimalDigits + 1);
         }
       }
-      // console.log(returnValue);
 
       return { pnValue: returnValue, roundedValue: parseFloat(roundedValue) };
     } catch (error) {

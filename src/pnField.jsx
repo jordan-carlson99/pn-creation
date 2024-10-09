@@ -5,6 +5,7 @@ export function PNField(props) {
   const [rows, setRows] = useState(1);
   const [fieldName, setFieldName] = useState("");
   const [parentAllow, setParentAllow] = useState("notAllowed");
+  const [activeArray, setActiveArray] = useState(Array(rows).fill(false));
 
   // props.field given to field name on mount
   useEffect(() => {
@@ -43,8 +44,23 @@ export function PNField(props) {
     }
   };
 
+  const handleParentAllow = (updatedArray) => {
+    setActiveArray(updatedArray);
+
+    // Check if any value is true to set the delimiter state
+    if (updatedArray.includes(true)) {
+      setParentAllow("");
+    } else {
+      setParentAllow("notAllowed");
+    }
+  };
+
   let rowElems = [];
   for (let i = 0; i < rows; i++) {
+    // console.log(activeArray[i]);
+    console.log(activeArray);
+
+    activeArray[i] = activeArray[i] || false;
     rowElems.push(
       <InputField
         col={props.col}
@@ -52,7 +68,9 @@ export function PNField(props) {
         setExample={props.setExample}
         defaultDesc={props.defaultDesc}
         key={`pnrow-${i}`}
-        setParentAllow={setParentAllow}
+        parentIndex={i}
+        activeArray={activeArray}
+        handleParentAllow={handleParentAllow}
       />
     );
   }
