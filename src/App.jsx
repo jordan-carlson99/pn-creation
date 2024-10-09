@@ -103,12 +103,14 @@ function App() {
         formData[2],
         formData[3]
       );
-      setExampleText(Object.keys(combos[0])[0]);
-      let csv = convertToCSV(combos);
-      const blob = new Blob([csv], { type: "application/octet-stream" });
-      const url = URL.createObjectURL(blob);
-      setBlobLink(url);
-      return combos;
+      if (combos) {
+        setExampleText(Object.keys(combos[0])[0]);
+        let csv = convertToCSV(combos);
+        const blob = new Blob([csv], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        setBlobLink(url);
+        return combos;
+      }
     } catch (error) {
       console.error("Error in run function:", error);
       return [false, false, false];
@@ -328,8 +330,10 @@ function App() {
             digitFormatting,
             delimiter
           );
-          valArr.push(`${formattedNumber.pnValue}${unit}`);
-          descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+          if (formattedNumber) {
+            valArr.push(`${formattedNumber.pnValue}${unit}`);
+            descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+          }
         } else if (eValueRange == undefined) {
           const formattedNumber = formatNumbering(
             roundedValue,
@@ -338,8 +342,11 @@ function App() {
             digitFormatting,
             delimiter
           );
-          valArr.push(`${formattedNumber.pnValue}${unit}`);
-          descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+
+          if (formattedNumber) {
+            valArr.push(`${formattedNumber.pnValue}${unit}`);
+            descArr.push(`${formattedNumber.roundedValue} ${descSuffix}`);
+          }
         }
       }
       return [valArr, descArr];
@@ -390,49 +397,90 @@ function App() {
     delimiter
   ) {
     try {
+      preDecimalDigits = parseInt(preDecimalDigits);
+      postDecimalDigits = parseInt(postDecimalDigits);
       let returnValue;
 
-      roundedValue = parseFloat(roundedValue).toString();
-
       if (digitFormatting == "significantDigit") {
-        let [preDecimalPart, postDecimalPart] = roundedValue.split(".");
+        roundedValue = parseFloat(roundedValue).toFixed(6);
+        let nonZeroRegex = /[1,2,3,4,5,6,7,8,9]+/gm;
 
-        preDecimalPart = preDecimalPart || "0";
-        postDecimalPart = postDecimalPart || "";
-
-        preDecimalPart = preDecimalPart.slice(0, preDecimalDigits);
-
-        let postDecimalSignificant = "";
-        let count = 0;
-        for (let i = 0; i < postDecimalPart.length; i++) {
-          if (postDecimalPart[i] !== "0") {
-            count++;
+        // If its under 100 we use delimiters
+        if (roundedValue < 100) {
+          let placeValue;
+          if (nonZeroRegex.test(roundedValue.split(".")[1])) {
+            // tenths = 1, hundeths = 2, thousandths = 3
+            placeValue = roundedValue
+              .split(".")[1]
+              .match(nonZeroRegex)[0].length;
           }
-          postDecimalSignificant += postDecimalPart[i];
-          if (count >= postDecimalDigits) {
-            break;
+
+          if (
+            (placeValue > 1 && roundedValue >= 10) ||
+            (roundedValue >= 10 && roundedValue.split(".")[1].startsWith("0"))
+          ) {
+            return false;
           }
+
+          // Basic delimiter
+          if (placeValue < 3 || placeValue === undefined) {
+            delimiter = delimiter || "";
+            returnValue = roundedValue.split(".").join(delimiter).slice(0, 4);
+            // Delimiter with 0 removed
+          } else if (placeValue >= 3) {
+            delimiter = delimiter || "";
+            returnValue = roundedValue.split(".").join(delimiter).slice(1, 5);
+            // 4th digit
+          }
+        } else if (roundedValue >= 100) {
+          // Starting from last significant number, count the numbers
+          let nonSigDigit = roundedValue.slice(
+            3,
+            roundedValue.split(".")[0].length
+          );
+          returnValue = roundedValue
+            .split(".")[0]
+            .slice(0, 3)
+            .concat(nonSigDigit.length);
+        }
+      } else {
+        let precedingZeroes = "";
+        const preChars = roundedValue.split(".")[0].length;
+        const lastZero = roundedValue.split(".")[1].indexOf("0");
+        let zeroRegex = /[1,2,3,4,5,6,7,8,9]+/gm;
+
+        for (let i = preChars; i < preDecimalDigits; i++) {
+          precedingZeroes += "0";
         }
 
-        returnValue =
-          preDecimalPart +
-          (postDecimalSignificant ? "." + postDecimalSignificant : "");
-      } else {
-        returnValue = parseFloat(roundedValue).toFixed(postDecimalDigits);
-      }
+        if (lastZero <= postDecimalDigits) {
+          returnValue =
+            precedingZeroes +
+            parseFloat(roundedValue).toFixed(postDecimalDigits);
+        } else {
+          returnValue =
+            precedingZeroes + roundedValue.slice(0, preChars + lastZero + 1);
+        }
 
-      if (delimiter) {
-        if (returnValue.startsWith("0.")) {
+        if (
+          preDecimalDigits === 0 &&
+          !zeroRegex.test(returnValue.split(".")[0])
+        ) {
           returnValue = "." + returnValue.split(".")[1];
         }
 
-        returnValue = returnValue.split(".").join(delimiter);
+        if (delimiter) {
+          returnValue = returnValue
+            .split(".")
+            .join(delimiter)
+            .slice(0, preDecimalDigits + postDecimalDigits + 1);
+        }
       }
+      // console.log(returnValue);
 
       return { pnValue: returnValue, roundedValue: parseFloat(roundedValue) };
     } catch (error) {
-      console.error("Error formatting numbering:", error);
-      return { pnValue: "", roundedValue: 0 };
+      console.error("error in formatNumber: ", error);
     }
   }
 
