@@ -23,7 +23,7 @@ const resistorDefaults = [
 ];
 
 const dKTemplateDefaults = [
-  { "Power Code (If not in PN)": "" },
+  { Power: "" },
   { "Operating Temp Range": "" },
   { "Package / Case": "" },
   { "Supplier Device Package": "" },
@@ -394,23 +394,20 @@ function App() {
       let returnValue;
 
       if (digitFormatting == "significantDigit") {
+        // console.log(roundedValue);
+
         roundedValue = parseFloat(roundedValue).toFixed(6);
-        let nonZeroRegex = /[1,2,3,4,5,6,7,8,9]+/gm;
 
         // If its under 100 we use delimiters
         if (roundedValue < 100) {
-          let placeValue;
-          if (nonZeroRegex.test(roundedValue.split(".")[1])) {
-            // tenths = 1, hundeths = 2, thousandths = 3
-            placeValue = roundedValue
-              .split(".")[1]
-              .match(nonZeroRegex)[0].length;
-          }
+          let placeValue = getLastNonZeroIndex(roundedValue);
 
           // Invalid combinations (uses too many digits, 10R1 (10.1) vs 10R1 (10.11) )
           if (
+            // 10R1 (10.10) <= good 10R1 (10.11) <= bad
             (placeValue > 1 && roundedValue >= 10) ||
-            (placeValue > 2 && !roundedValue.split(".")[1].startsWith("0")) ||
+            // R012 (0.012) <= good 1R01 (1.012) <= bad
+            (placeValue > 2 && !roundedValue.split(".")[0].startsWith("0")) ||
             (placeValue > 0 &&
               roundedValue >= 10 &&
               roundedValue.split(".")[1].startsWith("0"))
@@ -418,16 +415,17 @@ function App() {
             return false;
           }
 
-          // Basic delimiter
-          if (placeValue < 3 || placeValue === undefined) {
-            delimiter = delimiter || "";
-            returnValue = roundedValue.split(".").join(delimiter).slice(0, 4);
-            // Delimiter with 0 removed
-          } else if (placeValue >= 3) {
+          // Delimiter with 0 removed
+          if (placeValue > 1 && roundedValue < 1) {
             delimiter = delimiter || "";
             returnValue = roundedValue.split(".").join(delimiter).slice(1, 5);
-            // 4th digit
+            // Basic delimiter
+          } else {
+            delimiter = delimiter || "";
+            returnValue = roundedValue.split(".").join(delimiter).slice(0, 4);
           }
+
+          // 4th digit
         } else if (roundedValue >= 100) {
           // Starting from last significant number, count the numbers
           let nonSigDigit = roundedValue.slice(
@@ -552,6 +550,39 @@ function App() {
       </div>
     </>
   );
+}
+
+function getLastNonZeroIndex(num) {
+  try {
+    let numStr;
+    // Convert the number to a string
+    if (typeof numStr != "string") {
+      numStr = num?.toString();
+    }
+
+    // Find the index of the decimal point
+    const decimalIndex = numStr.indexOf(".");
+
+    // If there's no decimal point, return 0 (as it's an integer)
+    if (decimalIndex === -1) {
+      return 0;
+    }
+
+    // Get the fractional part of the number as a string
+    const fractionPart = numStr.slice(decimalIndex + 1);
+
+    // Loop through the fractional part from the end to find the last non-zero
+    for (let i = fractionPart.length - 1; i >= 0; i--) {
+      if (fractionPart[i] !== "0") {
+        return i;
+      }
+    }
+
+    // If no non-zero digit is found in the fractional part, return -1 (optional)
+    return 0;
+  } catch (error) {
+    console.error(`error in getting last nonzero index: ${error}`);
+  }
 }
 
 export default App;
