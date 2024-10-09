@@ -415,9 +415,13 @@ function App() {
               .match(nonZeroRegex)[0].length;
           }
 
+          // Invalid combinations (uses too many digits, 10R1 (10.1) vs 10R1 (10.11) )
           if (
             (placeValue > 1 && roundedValue >= 10) ||
-            (roundedValue >= 10 && roundedValue.split(".")[1].startsWith("0"))
+            (placeValue > 2 && !roundedValue.split(".")[1].startsWith("0")) ||
+            (placeValue > 0 &&
+              roundedValue >= 10 &&
+              roundedValue.split(".")[1].startsWith("0"))
           ) {
             return false;
           }
