@@ -394,8 +394,6 @@ function App() {
       let returnValue;
 
       if (digitFormatting == "significantDigit") {
-        // console.log(roundedValue);
-
         roundedValue = parseFloat(roundedValue).toFixed(6);
 
         // If its under 100 we use delimiters
