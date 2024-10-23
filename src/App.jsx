@@ -493,16 +493,17 @@ function App() {
     }
   });
 
-  useEffect(() => {
-    try {
-      let data = run();
-      if (data[0]) {
-        setExampleText(Object.keys(data[0])[0]);
-      }
-    } catch (error) {
-      console.error("Error in useEffect:", error);
-    }
-  }, [example]);
+  // Auto generation of PN
+  // useEffect(() => {
+  //   try {
+  //     let data = run();
+  //     if (data[0]) {
+  //       setExampleText(Object.keys(data[0])[0]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error in useEffect:", error);
+  //   }
+  // }, [example]);
 
   return (
     <>
