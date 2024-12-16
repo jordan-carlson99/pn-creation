@@ -554,7 +554,7 @@ function App() {
           <select
             value={selectedTemplate}
             onChange={handleSetTemplate}
-            className="custom-select"
+            className="btn btn-primary dropdown-toggle"
           >
             <option>DigiKey Template</option>
             <option>Default Resistor Template</option>
