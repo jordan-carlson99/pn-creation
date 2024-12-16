@@ -87,12 +87,15 @@ export function InputField(props) {
           name="isUse"
           value={true}
           onChange={handleAllow}
+          title="Select whether or not this value will included in the generated PN"
         ></input>
         <input
           name={`${allow}fieldVal ${props.col}-${props.fieldName}`}
           type="text"
           placeholder="Part numbering value"
           onChange={checkForRangeAndSetExample}
+          className="form-control"
+          title="Enter PN value (Enter [Min]~[Max] to select a range)"
         ></input>
         <input
           name={`${allow}descVal ${props.col}-${props.fieldName}`}
@@ -100,40 +103,61 @@ export function InputField(props) {
           placeholder={isRange ? "Unit" : "Description"}
           value={desc}
           onChange={changeDesc}
+          className="form-control"
+          title={
+            isRange
+              ? "Enter Unit for range value"
+              : "Enter description for PN value"
+          }
         ></input>
       </div>
 
       {isRange && (
         <div className="range-options card-header">
           <div className="delimiter-row">
-            <input
-              type="text"
-              placeholder="Delimiter"
-              name={`${allow}rangeDelim`}
-              className="delimiter-input"
-            ></input>
-            <select
-              name={`${allow}validateEIA`}
-              className="validation-dropdown"
-              value={validation}
-              onChange={handleValidation}
-            >
-              <option value="EIA">EIA Validation</option>
-              <option value="">No validation</option>
-            </select>
-            <select
-              onChange={handleDigitFormatting}
-              name={`${allow}digitFormatting`}
-              className="digit-formatting-dropdown"
-              value={significantDigitValidation}
-            >
-              <option value="significantDigit">Significant Digit</option>
-              <option value="custom">Custom</option>
-            </select>
+            <div className="btn-group">
+              <input
+                type="text"
+                placeholder="Delimiter"
+                name={`${allow}rangeDelim`}
+                className="delimiter-input form-control"
+                title="Enter the value that will replace the decimal, if any (e.g 1.0 => 1R0)"
+              ></input>
+              <select
+                name={`${allow}validateEIA`}
+                className="validation-dropdown btn btn-outline-primary dropdown-toggle"
+                value={validation}
+                onChange={handleValidation}
+                title="Select if the range will be validated by EIA standards for resistance"
+              >
+                <option value="EIA">EIA Validation</option>
+                <option value="">No validation</option>
+              </select>
+              <select
+                onChange={handleDigitFormatting}
+                name={`${allow}digitFormatting`}
+                className="digit-formatting-dropdown btn btn-outline-primary dropdown-toggle"
+                value={significantDigitValidation}
+                title="Select the digit formatting, hover over each for explanation"
+              >
+                <option
+                  value="significantDigit"
+                  title="Include the first 3 significant digits with a 4th meta character (e.g 4,000 => 4001 / 1.5 => 1R500)"
+                >
+                  Significant Digit
+                </option>
+                <option
+                  value="custom"
+                  title="Manually select the amount of digits before and after the decimal"
+                >
+                  Custom
+                </option>
+              </select>
+            </div>
           </div>
           <div className="options-container">
             {validation === "EIA" && (
-              <div className="eia-container">
+              <div className="eia-container input-group" title="EIA value">
                 <label htmlFor="eia-e6">
                   E6
                   <input
@@ -141,6 +165,7 @@ export function InputField(props) {
                     name={`${allow}eiaValue`}
                     value="e6"
                     onChange={checkForRangeAndSetExample}
+                    className="form-check-input"
                   ></input>
                 </label>
                 <label htmlFor="eia-e12">
@@ -151,6 +176,7 @@ export function InputField(props) {
                     id="eia-e12"
                     value="e12"
                     onChange={checkForRangeAndSetExample}
+                    className="form-check-input"
                   ></input>
                 </label>
                 <label htmlFor="eia-e24">
@@ -161,6 +187,7 @@ export function InputField(props) {
                     id="eia-e24"
                     value="e24"
                     onChange={checkForRangeAndSetExample}
+                    className="form-check-input"
                   ></input>
                 </label>
                 <label htmlFor="eia-e48">
@@ -171,6 +198,7 @@ export function InputField(props) {
                     id="eia-e48"
                     value="e48"
                     onChange={checkForRangeAndSetExample}
+                    className="form-check-input"
                   ></input>
                 </label>
                 <label htmlFor="eia-e96">
@@ -181,6 +209,7 @@ export function InputField(props) {
                     id="eia-e96"
                     value="e96"
                     onChange={checkForRangeAndSetExample}
+                    className="form-check-input"
                   ></input>
                 </label>
                 <label htmlFor="eia-e192">
@@ -191,6 +220,7 @@ export function InputField(props) {
                     id="eia-e192"
                     value="e192"
                     onChange={checkForRangeAndSetExample}
+                    className="form-check-input"
                   ></input>
                 </label>
               </div>

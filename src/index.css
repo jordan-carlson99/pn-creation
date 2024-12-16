@@ -92,6 +92,7 @@ body {
 
 .validation-dropdown {
   width: 100%;
+  border-radius: 0px;
 }
 
 .generation-controls {
@@ -137,4 +138,13 @@ body {
   display: flex;
   margin-bottom: 2%;
   justify-content: center;
+  align-items: center;
+}
+
+#example-text {
+  color: white;
+}
+
+.form-check-input {
+  margin-left: 5px;
 }

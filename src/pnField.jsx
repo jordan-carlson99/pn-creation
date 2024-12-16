@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { InputField } from "./inputField";
 
 export function PNField(props) {
@@ -79,8 +79,9 @@ export function PNField(props) {
           type="text"
           onChange={changeName}
           placeholder="Field Name"
-          className="field-name"
+          className="field-name form-control"
           value={fieldName}
+          title="Enter a name for the field (This will be the table column in Excel)"
         ></input>
         {rowElems}
         <button
@@ -88,20 +89,26 @@ export function PNField(props) {
           className="btn btn-outline-danger"
           onClick={subRow}
         >
-          Remove Field
+          Remove Option
         </button>
         <button
           type="button"
           className="btn btn-outline-success"
           onClick={addRow}
         >
-          Add Field
+          Add Option
         </button>
       </div>
       {props.col !== props.total - 1 && (
-        <div className="delimiter-container">
-          <select name={`${parentAllow}delimiter`}>
-            <option>(none)</option>
+        <div className="input-group">
+          <div className="input-group-prepend">
+            <span className="input-group-text">Delimiter</span>
+          </div>
+          <select
+            name={`${parentAllow}delimiter`}
+            className="btn btn-outline-primary dropdown-toggle"
+          >
+            <option className="dropdown-item">(none)</option>
             <option>-</option>
           </select>
         </div>

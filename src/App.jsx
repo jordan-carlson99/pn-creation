@@ -521,7 +521,7 @@ function App() {
             id="rem-field-btn"
             onClick={subField}
           >
-            - Remove Field
+            Remove Field
           </button>
           <div id="preview-reset-container" className="btn-group">
             <button
@@ -547,7 +547,7 @@ function App() {
             id="add-field-btn"
             onClick={addField}
           >
-            + Add Field
+            Add Field
           </button>
         </div>
         <div className="btn-group">
@@ -572,7 +572,7 @@ function App() {
         >
           Download CSV
         </a>
-        <h3>{exampleText}</h3>
+        <h3 id="example-text">{exampleText}</h3>
       </div>
     </>
   );
