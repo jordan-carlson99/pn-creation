@@ -520,6 +520,7 @@ function App() {
             className="addition-btn btn btn-light"
             id="rem-field-btn"
             onClick={subField}
+            title="Remove Last Field"
           >
             Remove Field
           </button>
@@ -529,6 +530,7 @@ function App() {
               className="addition-btn btn btn-light"
               id="preview-btn"
               onClick={run}
+              title="Show preview of current PN"
             >
               Show Preview
             </button>
@@ -537,6 +539,7 @@ function App() {
               className="run-btn btn btn-danger"
               type="button"
               onClick={resetField}
+              title="Reset all fields"
             >
               Reset
             </button>
@@ -546,6 +549,7 @@ function App() {
             className="addition-btn btn btn-light"
             id="add-field-btn"
             onClick={addField}
+            title="Add field to end"
           >
             Add Field
           </button>
@@ -556,11 +560,20 @@ function App() {
             onChange={handleSetTemplate}
             className="btn btn-outline-primary dropdown-toggle"
             id="template-btn"
+            title="Select a template to add a number of fields to fill in"
           >
-            <option>DigiKey Template</option>
-            <option>Default Resistor Template</option>
+            <option title="Template for adding parts into DigiKey">
+              DigiKey Template
+            </option>
+            <option title="Template for default chip resistor parameters">
+              Default Resistor Template
+            </option>
           </select>
-          <button onClick={addTemplate} className="btn btn-warning">
+          <button
+            onClick={addTemplate}
+            className="btn btn-warning"
+            title="Add the selected template"
+          >
             Add Template
           </button>
         </div>
@@ -570,6 +583,7 @@ function App() {
           id="download-btn"
           onClick={run}
           className="btn btn btn-success"
+          title="Run and download the combinations"
         >
           Download CSV
         </a>

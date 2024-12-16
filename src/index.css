@@ -108,7 +108,7 @@ body {
   justify-self: center;
   height: 25dvh;
   border-radius: 10px;
-  z-index: 2;
+  z-index: 3;
 }
 
 #custom-field-container {

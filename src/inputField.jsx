@@ -88,6 +88,7 @@ export function InputField(props) {
           value={true}
           onChange={handleAllow}
           title="Select whether or not this value will included in the generated PN"
+          className="form-check-input"
         ></input>
         <input
           name={`${allow}fieldVal ${props.col}-${props.fieldName}`}

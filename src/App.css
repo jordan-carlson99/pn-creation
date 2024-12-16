@@ -8,6 +8,7 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
 }
 
 #site-header {
@@ -20,6 +21,14 @@
 #tft-logo {
   max-height: 80%;
   margin: 0.5%;
+}
+
+#site-footer {
+  width: 100%;
+  height: 10dvh;
+  background-color: #075784;
+  bottom: 0;
+  z-index: 2;
 }
 
 .card {
