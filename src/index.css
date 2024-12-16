@@ -148,3 +148,15 @@ body {
 .form-check-input {
   margin-left: 5px;
 }
+
+#template-btn {
+  background-color: white;
+}
+
+#template-btn:hover {
+  background-color: rgb(13, 110, 253);
+}
+
+#template-btn:focus {
+  background-color: rgb(13, 110, 253);
+}
