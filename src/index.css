@@ -79,6 +79,7 @@ button:focus-visible {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  border: 1px solid blue;
 }
 
 #pn-form {
@@ -137,11 +138,26 @@ button:focus-visible {
 .generation-controls {
   display: flex;
   flex-direction: column;
-  position: fixed;
+  position: sticky;
   left: 0;
-  width: 100dvw;
+  margin-top: 10px;
   background-color: #213547;
   bottom: 0;
+  border: 1px solid red;
+  min-width: 20%;
+  justify-self: center;
+  height: 25dvh;
+}
+
+#custom-field-container {
+  display: flex;
+  border: 1px solid orange;
+  height: 50%;
+}
+
+.addition-btn {
+  width: 33.4%;
+  height: 100%;
 }
 
 /* @media (prefers-color-scheme: light) {

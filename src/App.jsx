@@ -39,6 +39,7 @@ function App() {
   const [blobLink, setBlobLink] = useState("/");
   const [example, setExample] = useState(null);
   const [exampleText, setExampleText] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState("DigiKey Template");
 
   const formRef = useRef(null);
 
@@ -68,19 +69,19 @@ function App() {
     }
   };
 
-  const addTemplate = () => {
-    try {
-      setFields([...fields, ...dKTemplateDefaults]);
-    } catch (error) {
-      console.error("Error adding template:", error);
-    }
+  const handleSetTemplate = (e) => {
+    setSelectedTemplate(e.target.value);
   };
 
-  const addMetadata = () => {
+  const addTemplate = () => {
     try {
-      setFields([...fields, ...resistorDefaults]);
+      if (selectedTemplate === "DigiKey Template") {
+        setFields([...fields, ...dKTemplateDefaults]);
+      } else if (selectedTemplate === "Default Resistor Template") {
+        setFields([...fields, ...resistorDefaults]);
+      }
     } catch (error) {
-      console.error("Error adding metadata:", error);
+      console.error("Error adding template:", error);
     }
   };
 
@@ -513,35 +514,42 @@ function App() {
         </form>
       </div>
       <div className="generation-controls">
-        <div>
-          <button type="button" className="addition-btn" onClick={subField}>
-            -
-          </button>
-
-          <button className="run-btn" type="button" onClick={run}>
-            Run
-          </button>
-          <button className="run-btn" type="button" onClick={resetField}>
-            Reset
-          </button>
-          <button type="button" className="addition-btn" onClick={addField}>
-            +
+        <div id="custom-field-container">
+          <button
+            type="button"
+            className="addition-btn"
+            id="rem-field-btn"
+            onClick={subField}
+          >
+            - Remove Field
           </button>
           <button
             type="button"
-            className="template-input"
-            onClick={addTemplate}
+            className="addition-btn"
+            id="preview-btn"
+            onClick={run}
           >
-            Add DK Template
+            Show Preview
           </button>
           <button
             type="button"
-            className="template-addition"
-            onClick={addMetadata}
+            className="addition-btn"
+            id="add-field-btn"
+            onClick={addField}
           >
-            Add Default Resistor Values
+            + Add Field
           </button>
         </div>
+        <div>
+          <select value={selectedTemplate} onChange={handleSetTemplate}>
+            <option>DigiKey Template</option>
+            <option>Default Resistor Template</option>
+          </select>
+          <button onClick={addTemplate}>Add Template</button>
+        </div>
+        <button className="run-btn" type="button" onClick={resetField}>
+          Reset
+        </button>
         <a href={blobLink} download={`pn_creation-${exampleText}.csv`}>
           Download CSV
         </a>
