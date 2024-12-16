@@ -73,8 +73,8 @@ export function PNField(props) {
   }
 
   return (
-    <>
-      <div className="column" key={props.col}>
+    <div className="pn-field-container card">
+      <div className="column btn-group" key={props.col}>
         <input
           type="text"
           onChange={changeName}
@@ -83,11 +83,19 @@ export function PNField(props) {
           value={fieldName}
         ></input>
         {rowElems}
-        <button type="button" className="addition-btn" onClick={subRow}>
-          -
+        <button
+          type="button"
+          className="btn btn-outline-danger"
+          onClick={subRow}
+        >
+          Remove Field
         </button>
-        <button type="button" className="addition-btn" onClick={addRow}>
-          +
+        <button
+          type="button"
+          className="btn btn-outline-success"
+          onClick={addRow}
+        >
+          Add Field
         </button>
       </div>
       {props.col !== props.total - 1 && (
@@ -98,6 +106,6 @@ export function PNField(props) {
           </select>
         </div>
       )}
-    </>
+    </div>
   );
 }

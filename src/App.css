@@ -10,6 +10,18 @@
   flex-direction: column;
 }
 
+#site-header {
+  background-color: #075784;
+  height: 10dvh;
+  border: 1px solid black;
+  width: 100%;
+}
+
+#tft-logo {
+  max-height: 80%;
+  margin: 0.5%;
+}
+
 .card {
   padding: 2em;
 }

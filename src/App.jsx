@@ -514,43 +514,62 @@ function App() {
         </form>
       </div>
       <div className="generation-controls">
-        <div id="custom-field-container">
+        <div id="custom-field-container" className="btn-group">
           <button
             type="button"
-            className="addition-btn"
+            className="addition-btn btn btn-light"
             id="rem-field-btn"
             onClick={subField}
           >
             - Remove Field
           </button>
+          <div id="preview-reset-container" className="btn-group">
+            <button
+              type="button"
+              className="addition-btn btn btn-light"
+              id="preview-btn"
+              onClick={run}
+            >
+              Show Preview
+            </button>
+            <button
+              id="reset-btn"
+              className="run-btn btn btn-danger"
+              type="button"
+              onClick={resetField}
+            >
+              Reset
+            </button>
+          </div>
           <button
             type="button"
-            className="addition-btn"
-            id="preview-btn"
-            onClick={run}
-          >
-            Show Preview
-          </button>
-          <button
-            type="button"
-            className="addition-btn"
+            className="addition-btn btn btn-light"
             id="add-field-btn"
             onClick={addField}
           >
             + Add Field
           </button>
         </div>
-        <div>
-          <select value={selectedTemplate} onChange={handleSetTemplate}>
+        <div className="btn-group">
+          <select
+            value={selectedTemplate}
+            onChange={handleSetTemplate}
+            className="custom-select"
+          >
             <option>DigiKey Template</option>
             <option>Default Resistor Template</option>
           </select>
-          <button onClick={addTemplate}>Add Template</button>
+          <button onClick={addTemplate} className="btn btn-warning">
+            Add Template
+          </button>
         </div>
-        <button className="run-btn" type="button" onClick={resetField}>
-          Reset
-        </button>
-        <a href={blobLink} download={`pn_creation-${exampleText}.csv`}>
+        <a
+          href={blobLink}
+          download={`pn_creation-${exampleText}.csv`}
+          id="download-btn"
+          onClick={run}
+          className="btn btn btn-success"
+        >
           Download CSV
         </a>
         <h3>{exampleText}</h3>

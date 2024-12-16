@@ -104,7 +104,7 @@ export function InputField(props) {
       </div>
 
       {isRange && (
-        <div className="range-options">
+        <div className="range-options card-header">
           <div className="delimiter-row">
             <input
               type="text"
