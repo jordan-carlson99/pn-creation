@@ -300,9 +300,9 @@ function App() {
     try {
       let arr = value.split("~");
       increment = parseFloat(increment);
-      let start = parseFloat(arr[0]);
-      let end = parseFloat(arr[1]);
-      let unit = arr[1].split(end)[1];
+      let start = parseFloat("0".concat(arr[0]));
+      let end = parseFloat("0".concat(arr[1]));
+      let unit = arr[1].split(end)[1] || "";
       let descSuffix = description.split(end)[1] || description;
       let valArr = [];
       let descArr = [];
