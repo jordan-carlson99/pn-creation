@@ -126,6 +126,17 @@ body {
   flex-direction: column;
 }
 
+#reset-btn {
+  margin-bottom: 2%;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+#pn-card-col-0 {
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
 #preview-btn {
   width: 100%;
 }

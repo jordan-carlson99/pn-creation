@@ -476,7 +476,28 @@ function App() {
     }
   }
 
-  const fieldElements = [];
+  const fieldElements = [
+    <button
+      id="reset-btn"
+      className="run-btn btn btn-danger"
+      type="button"
+      onClick={resetField}
+      title="Reset all fields"
+    >
+      Reset All
+    </button>,
+  ];
+  // fieldElements.push(
+  //   <button
+  //     id="reset-btn"
+  //     className="run-btn btn btn-danger"
+  //     type="button"
+  //     onClick={resetField}
+  //     title="Reset all fields"
+  //   >
+  //     Reset All
+  //   </button>
+  // );
   fields.forEach((field, i) => {
     for (let param in field) {
       fieldElements.push(
@@ -534,7 +555,7 @@ function App() {
             >
               Show Preview
             </button>
-            <button
+            {/* <button
               id="reset-btn"
               className="run-btn btn btn-danger"
               type="button"
@@ -542,7 +563,7 @@ function App() {
               title="Reset all fields"
             >
               Reset
-            </button>
+            </button> */}
           </div>
           <button
             type="button"

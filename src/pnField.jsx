@@ -73,7 +73,7 @@ export function PNField(props) {
   }
 
   return (
-    <div className="pn-field-container card">
+    <div className="pn-field-container card" id={`pn-card-col-${props.col}`}>
       <div className="column btn-group" key={props.col}>
         <input
           type="text"
