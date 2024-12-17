@@ -63,7 +63,7 @@ function App() {
 
   const resetField = () => {
     try {
-      setFields([{ "": "" }]);
+      setFields([]);
     } catch (error) {
       console.error("Error resetting fields:", error);
     }
