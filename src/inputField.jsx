@@ -143,7 +143,7 @@ export function InputField(props) {
               >
                 <option
                   value="significantDigit"
-                  title="Include the first 3 significant digits with a 4th meta character (e.g 4,000 => 4001 / 1.5 => 1R500)"
+                  title="Include the first 3 significant digits with a 4th meta character (e.g 4,000 => 4001 / 1.5 => 1R50)"
                 >
                   Significant Digit
                 </option>
